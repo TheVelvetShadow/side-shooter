@@ -21,11 +21,13 @@ func _ready() -> void:
 	current_shield = max_shield
 	fire_timer.wait_time = fire_rate
 	fire_timer.one_shot = true
+	add_to_group("player")
 
 func _physics_process(_delta: float) -> void:
 	_handle_movement()
 	_handle_firing()
 	move_and_slide()
+	clamp_to_screen()
 
 func _handle_movement() -> void:
 	var direction := Vector2.ZERO

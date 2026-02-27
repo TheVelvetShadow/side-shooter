@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://wyj3wlktp26a"]
+
+[ext_resource type="Script" path="res://scripts/main/Main.gd" id="1_maingd"]
+[ext_resource type="PackedScene" uid="uid://b8u30hr14yhr1" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://cv4sru8n6v3ud" path="res://scenes/enemies/Enemy.tscn" id="3_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/EnemySpawner.tscn" id="4_spawner"]
+[ext_resource type="PackedScene" uid="uid://hud001tscn0001" path="res://scenes/ui/HUD.tscn" id="5_hud"]
+[ext_resource type="PackedScene" uid="uid://kamikazedrone001" path="res://scenes/enemies/KamikazeDrone.tscn" id="6_kamikaze"]
+[ext_resource type="PackedScene" uid="uid://turretplatform001" path="res://scenes/enemies/TurretPlatform.tscn" id="7_turret"]
+[ext_resource type="PackedScene" uid="uid://enemybullet001" path="res://scenes/enemies/EnemyBullet.tscn" id="8_ebullet"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_maingd")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(16, 23)
+
+[node name="EnemySpawner" parent="." instance=ExtResource("4_spawner")]
+enemy_scene = ExtResource("3_enemy")
+kamikaze_scene = ExtResource("6_kamikaze")
+turret_scene = ExtResource("7_turret")
+enemy_bullet_scene = ExtResource("8_ebullet")
+
+[node name="HUD" parent="." instance=ExtResource("5_hud")]

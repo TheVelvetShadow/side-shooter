@@ -8,6 +8,7 @@ var current_ship_id: String = "interceptor"
 # --- XP ---
 var meta_xp: int = 0        # Permanent, survives death
 var run_xp: int = 0         # Lost on death, used for in-run levels
+var high_score: int = 0
 
 # --- Ship level (in-run) ---
 var ship_level: int = 1
@@ -30,6 +31,8 @@ func start_run(ship_id: String) -> void:
 
 func end_run(victory: bool) -> void:
 	run_active = false
+	if run_xp > high_score:
+		high_score = run_xp
 	if victory:
 		EventBus.run_completed.emit()
 	else:

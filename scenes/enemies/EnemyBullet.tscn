@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://enemybullet001"]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyBullet.gd" id="1_ebullet"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_001"]
+size = Vector2(10, 4)
+
+[node name="EnemyBullet" type="Area2D"]
+collision_layer = 8
+collision_mask = 1
+script = ExtResource("1_ebullet")
+
+[node name="Visual" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-5, -2, 5, -2, 5, 2, -5, 2)
+color = Color(1, 0.2, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_001")

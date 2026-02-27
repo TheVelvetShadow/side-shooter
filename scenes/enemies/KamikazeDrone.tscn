@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://kamikazedrone001"]
+
+[ext_resource type="Script" path="res://scripts/enemies/KamikazeDrone.gd" id="1_kamikaze"]
+[ext_resource type="Texture2D" uid="uid://bfpgungq1aigb" path="res://assets/sprites/Enemies/EvilEye_1.png" id="2_eyetex"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_001"]
+radius = 20.0
+
+[node name="KamikazeDrone" type="Area2D"]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_kamikaze")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.13, 0.13)
+texture = ExtResource("2_eyetex")
+modulate = Color(1, 0.5, 0.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_001")

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://turretplatform001"]
+
+[ext_resource type="Script" path="res://scripts/enemies/TurretPlatform.gd" id="1_turret"]
+[ext_resource type="Texture2D" uid="uid://bfpgungq1aigb" path="res://assets/sprites/Enemies/EvilEye_1.png" id="2_eyetex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_001"]
+size = Vector2(48, 48)
+
+[node name="TurretPlatform" type="Area2D"]
+collision_layer = 2
+collision_mask = 4
+script = ExtResource("1_turret")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.13, 0.13)
+texture = ExtResource("2_eyetex")
+modulate = Color(0.5, 0.5, 1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_001")
+
+[node name="FireTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = false
