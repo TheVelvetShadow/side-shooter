@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://b8u30hr14yhr1"]
+
+[ext_resource type="Script" uid="uid://dtolon3iup3py" path="res://scripts/player/Player.gd" id="1_dovo2"]
+[ext_resource type="Texture2D" uid="uid://2x67ci26jjuq" path="res://assets/sprites/Ships/Spaceship_8.png" id="2_gmlin"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lvxji"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_gmlin")
+}],
+"loop": true,
+"name": &"Fly",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dovo2"]
+radius = 24.0
+height = 166.0
+
+[node name="Player" type="CharacterBody2D" unique_id=946972008]
+script = ExtResource("1_dovo2")
+
+[node name="Ship" type="AnimatedSprite2D" parent="." unique_id=743660634]
+position = Vector2(103, 77.00001)
+scale = Vector2(0.41144794, 0.3443261)
+sprite_frames = SubResource("SpriteFrames_lvxji")
+animation = &"Fly"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=998221157]
+position = Vector2(102, 88)
+shape = SubResource("CapsuleShape2D_dovo2")
+
+[node name="BulletSpawn" type="Marker2D" parent="." unique_id=755192362]
+position = Vector2(102, 8)
+
+[node name="FireTimer" type="Timer" parent="." unique_id=482845222]
