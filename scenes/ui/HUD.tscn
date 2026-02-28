@@ -16,9 +16,22 @@ offset_right = -8.0
 offset_bottom = 36.0
 text = "Score: 0"
 
-[node name="HPLabel" type="Label" parent="."]
+[node name="ShieldBar" type="ProgressBar" parent="."]
 offset_left = 8.0
 offset_top = 8.0
-offset_right = 200.0
-offset_bottom = 36.0
-text = "HP: 100 / 100"
+offset_right = 208.0
+offset_bottom = 26.0
+max_value = 50.0
+value = 50.0
+show_percentage = false
+modulate = Color(0.2, 0.7, 1.0, 1.0)
+
+[node name="HPBar" type="ProgressBar" parent="."]
+offset_left = 8.0
+offset_top = 30.0
+offset_right = 208.0
+offset_bottom = 48.0
+max_value = 100.0
+value = 100.0
+show_percentage = false
+modulate = Color(0.2, 1.0, 0.3, 1.0)
