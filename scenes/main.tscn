@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://btlif2yiexto7" path="res://scenes/enemies/KamikazeDrone.tscn" id="6_kamikaze"]
 [ext_resource type="PackedScene" uid="uid://ca4f2w2lggcls" path="res://scenes/enemies/TurretPlatform.tscn" id="7_turret"]
 [ext_resource type="PackedScene" uid="uid://ci4vvpn0w5q7y" path="res://scenes/enemies/EnemyBullet.tscn" id="8_ebullet"]
+[ext_resource type="PackedScene" uid="uid://levelup001tscn" path="res://scenes/ui/LevelUpUI.tscn" id="9_levelup"]
 
 [node name="Main" type="Node" unique_id=641290497]
 script = ExtResource("1_maingd")
@@ -25,3 +26,5 @@ turret_scene = ExtResource("7_turret")
 enemy_bullet_scene = ExtResource("8_ebullet")
 
 [node name="HUD" parent="." unique_id=757137638 instance=ExtResource("5_hud")]
+
+[node name="LevelUpUI" parent="." instance=ExtResource("9_levelup")]

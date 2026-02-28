@@ -46,6 +46,7 @@ func fire() -> void:
 		return
 	can_fire = false
 	var bullet = bullet_scene.instantiate()
+	bullet.damage = int(10.0 * attack_multiplier)
 	bullet.global_position = bullet_spawn.global_position
 	get_tree().root.add_child(bullet)
 	EventBus.bullet_fired.emit({"position": bullet_spawn.global_position})
@@ -75,6 +76,21 @@ func heal(amount: int) -> void:
 func die() -> void:
 	EventBus.player_died.emit()
 	queue_free()
+
+func apply_upgrade(upgrade_id: String) -> void:
+	match upgrade_id:
+		"hp":
+			max_hp += 20
+			heal(20)
+			EventBus.player_hp_changed.emit(current_hp, max_hp)
+		"shield":
+			max_shield += 15
+			current_shield = max_shield
+			EventBus.player_shield_changed.emit(current_shield, max_shield)
+		"attack":
+			attack_multiplier += 0.2
+		"speed":
+			move_speed += 30.0
 
 func clamp_to_screen() -> void:
 	var screen := get_viewport_rect().size

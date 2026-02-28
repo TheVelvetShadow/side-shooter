@@ -20,6 +20,7 @@ signal enemy_spawned(enemy_id: String)
 signal xp_gained(amount: int)
 signal run_xp_gained(amount: int)
 signal ship_levelled_up(new_level: int)
+signal upgrade_chosen(upgrade_id: String)
 
 # Game state signals
 signal level_started(level_number: int)

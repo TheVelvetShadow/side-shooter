@@ -8,55 +8,11 @@
 ---
 
 ## 🔴 IN PROGRESS
-- [ ] Enemy 1 - multiple spawns with movement
+- [ ] Phase 3 - Weapon system
 
 ---
 
-## 📋 PHASE 1 - Core Gameplay (MVP)
-
-### Player
-- [x] Ship movement (WASD)
-- [x] Basic firing mechanic
-- [x] HP / Shield system
-- [x] Death signal
-- [ ] Screen boundary clamping (clamp_to_screen wired up)
-- [ ] Bullet scene and script
-- [ ] Fire rate working end to end
-
-### Enemies
-- [ ] Enemy 1 - Scout Fighter (basic, moves left across screen)
-- [ ] Enemy 2 - Kamikaze Drone (flies directly at player)
-- [ ] Enemy 3 - Turret Platform (stationary, shoots at player)
-- [ ] Enemy spawner system (waves, timing)
-- [ ] Enemy drops XP on death
-
-### Combat
-- [ ] Bullet hits enemy (collision detection)
-- [ ] Enemy takes damage and dies
-- [ ] Enemy bullets damage player
-- [ ] Player death triggers game over
-
-### Scene Structure
-- [x] Player.tscn
-- [ ] Bullet.tscn
-- [ ] Enemy1.tscn (Scout Fighter)
-- [ ] Main.tscn (playable level)
-
----
-
-## 📋 PHASE 2 - Progression
-
-### XP & Levelling
-- [ ] XP drops from enemies
-- [ ] XP counter in GameManager
-- [ ] Ship levels up at XP thresholds
-- [ ] Level up offers 3 stat upgrade choices
-
-### Stat Upgrades
-- [ ] HP upgrade
-- [ ] Shield upgrade
-- [ ] Attack multiplier upgrade
-- [ ] Speed upgrade
+## 📋 PHASE 3 - Weapons
 
 ---
 
@@ -135,8 +91,7 @@
 - [ ] Visual effects (explosions, bullet trails)
 - [ ] Audio - music
 - [ ] Audio - SFX per weapon
-- [ ] UI - HP/Shield bars
-- [ ] UI - XP counter
+- [ ] UI - XP bar (shows progress to next level)
 - [ ] UI - Active cards display
 - [ ] UI - Weapon slots display
 - [ ] Main menu
@@ -147,19 +102,57 @@
 ---
 
 ## ✅ DONE
+
+### Project Setup
 - [x] Project setup and folder structure
 - [x] GUT testing framework installed
 - [x] EventBus.gd (signal system)
 - [x] GameManager.gd (global state)
-- [x] Player.gd (movement, HP/shield, death)
-- [x] Input mapping (WASD)
 - [x] Autoloads configured
+
+### Phase 1 - Core Gameplay (MVP) ✅ COMPLETE
+- [x] Ship movement (WASD)
+- [x] Basic firing mechanic
+- [x] HP / Shield system
+- [x] Death signal
+- [x] Screen boundary clamping
+- [x] Bullet scene and script (Bullet.tscn / Bullet.gd)
+- [x] Fire rate working end to end (FireTimer)
+- [x] Enemy 1 - Scout Fighter (wave movement, Enemy.tscn)
+- [x] Enemy 2 - Kamikaze Drone (homing, KamikazeDrone.tscn)
+- [x] Enemy 3 - Turret Platform (shoots bullets, TurretPlatform.tscn)
+- [x] Enemy spawner system (waves: flock / kamikaze rush / turret line)
+- [x] Enemy drops XP on death (GameManager._on_enemy_died)
+- [x] Bullet hits enemy (collision detection)
+- [x] Enemy takes damage and dies
+- [x] Enemy bullets damage player (EnemyBullet.gd)
+- [x] Player death triggers game over
+- [x] Player.tscn
+- [x] Bullet.tscn
+- [x] Enemy1.tscn (Scout Fighter)
+- [x] Main.tscn (playable level)
+
+### Phase 2 - Progression ✅ COMPLETE
+- [x] XP drops from enemies
+- [x] XP counter in GameManager (run_xp, ship_xp)
+- [x] Ship levels up at XP thresholds (_check_level_up)
+- [x] Level up offers 3 stat upgrade choices (LevelUpUI.tscn, pauses game)
+- [x] HP upgrade (+20 max HP, restores HP)
+- [x] Shield upgrade (+15 max shield, full restore)
+- [x] Attack multiplier upgrade (+20% damage per bullet)
+- [x] Speed upgrade (+30 move speed)
+
+### Phase 7 - Polish (partial)
+- [x] Scrolling parallax background
+- [x] UI - HP/Shield bars (HUD.tscn)
+- [x] UI - Score display
+- [x] UI - XP bar with level display (bottom-left HUD)
+- [x] Game over screen with score + best score + restart
 
 ---
 
 ## 🐛 KNOWN BUGS / BLOCKERS
 - [ ] 2193 debug notices on startup - investigate source
-- [ ] clamp_to_screen() not called in _physics_process yet
 
 ---
 
@@ -169,3 +162,4 @@
 - EventBus pattern for decoupled signals
 - ui_left/right/up/down replaced with custom move_ actions
 - Bullet firing uses spacebar (fire action)
+- Collision layers: 1=Player, 2=Enemies, 4=Player bullets, 8=Enemy bullets

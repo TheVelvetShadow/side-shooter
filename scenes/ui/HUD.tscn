@@ -5,17 +5,6 @@
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
 
-[node name="ScoreLabel" type="Label" parent="."]
-anchor_left = 1.0
-anchor_top = 0.0
-anchor_right = 1.0
-anchor_bottom = 0.0
-offset_left = -160.0
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = 36.0
-text = "Score: 0"
-
 [node name="ShieldBar" type="ProgressBar" parent="."]
 offset_left = 8.0
 offset_top = 8.0
@@ -35,3 +24,123 @@ max_value = 100.0
 value = 100.0
 show_percentage = false
 modulate = Color(0.2, 1.0, 0.3, 1.0)
+
+[node name="ScoreLabel" type="Label" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -160.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 36.0
+text = "Score: 0"
+
+[node name="LevelLabel" type="Label" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -24.0
+offset_right = 60.0
+offset_bottom = -6.0
+text = "Lv. 1"
+theme_override_font_sizes/font_size = 14
+
+[node name="XPBar" type="ProgressBar" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 64.0
+offset_top = -24.0
+offset_right = 264.0
+offset_bottom = -6.0
+max_value = 100.0
+value = 0.0
+show_percentage = false
+modulate = Color(1.0, 0.85, 0.2, 1.0)
+
+[node name="CardSlots" type="HBoxContainer" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -374.0
+offset_top = -76.0
+offset_right = -8.0
+offset_bottom = -8.0
+theme_override_constants/separation = 6
+
+[node name="Slot0" type="Panel" parent="CardSlots"]
+layout_mode = 2
+custom_minimum_size = Vector2(56, 60)
+modulate = Color(0.5, 0.5, 0.5, 0.6)
+
+[node name="Label" type="Label" parent="CardSlots/Slot0"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 11
+
+[node name="Slot1" type="Panel" parent="CardSlots"]
+layout_mode = 2
+custom_minimum_size = Vector2(56, 60)
+modulate = Color(0.5, 0.5, 0.5, 0.6)
+
+[node name="Label" type="Label" parent="CardSlots/Slot1"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 11
+
+[node name="Slot2" type="Panel" parent="CardSlots"]
+layout_mode = 2
+custom_minimum_size = Vector2(56, 60)
+modulate = Color(0.5, 0.5, 0.5, 0.6)
+
+[node name="Label" type="Label" parent="CardSlots/Slot2"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 11
+
+[node name="Slot3" type="Panel" parent="CardSlots"]
+layout_mode = 2
+custom_minimum_size = Vector2(56, 60)
+modulate = Color(0.5, 0.5, 0.5, 0.6)
+
+[node name="Label" type="Label" parent="CardSlots/Slot3"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 11
+
+[node name="Slot4" type="Panel" parent="CardSlots"]
+layout_mode = 2
+custom_minimum_size = Vector2(56, 60)
+modulate = Color(0.5, 0.5, 0.5, 0.6)
+
+[node name="Label" type="Label" parent="CardSlots/Slot4"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 11
+
+[node name="Slot5" type="Panel" parent="CardSlots"]
+layout_mode = 2
+custom_minimum_size = Vector2(56, 60)
+modulate = Color(0.5, 0.5, 0.5, 0.6)
+
+[node name="Label" type="Label" parent="CardSlots/Slot5"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 11
