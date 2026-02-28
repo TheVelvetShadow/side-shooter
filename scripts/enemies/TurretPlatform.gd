@@ -1,6 +1,8 @@
 extends Area2D
 class_name TurretPlatform
 
+const _PICKUP_SCENE = preload("res://scenes/weapons/WeaponPickup.tscn")
+
 @export var enemy_id: String = "turret"
 @export var max_hp: int = 50
 @export var xp_value: int = 20
@@ -47,7 +49,15 @@ func take_damage(amount: int) -> void:
 
 func die() -> void:
 	EventBus.enemy_died.emit(enemy_id, xp_value)
+	_try_drop_weapon()
 	queue_free()
+
+func _try_drop_weapon() -> void:
+	if randf() < 0.3:
+		var pickup = _PICKUP_SCENE.instantiate()
+		pickup.weapon_type = WeaponDB.random_weapon()["type"]
+		pickup.global_position = global_position
+		get_tree().root.add_child(pickup)
 
 func _on_area_entered(area: Area2D) -> void:
 	if area is Bullet:

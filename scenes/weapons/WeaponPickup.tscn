@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://weaponpickup001"]
+
+[ext_resource type="Script" path="res://scripts/weapons/WeaponPickup.gd" id="1_pickup"]
+
+[sub_resource type="RectangleShape2D" id="RectShape001"]
+size = Vector2(16, 16)
+
+[node name="WeaponPickup" type="Area2D"]
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+monitorable = false
+script = ExtResource("1_pickup")
+
+[node name="Visual" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, -10, 10, 0, 0, 10, -10, 0)
+color = Color(1, 1, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectShape001")

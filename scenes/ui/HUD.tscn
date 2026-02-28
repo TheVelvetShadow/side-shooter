@@ -25,6 +25,39 @@ value = 100.0
 show_percentage = false
 modulate = Color(0.2, 1.0, 0.3, 1.0)
 
+[node name="WeaponSlots" type="HBoxContainer" parent="."]
+offset_left = 8.0
+offset_top = 54.0
+offset_right = 234.0
+offset_bottom = 78.0
+theme_override_constants/separation = 4
+
+[node name="Slot0" type="Panel" parent="WeaponSlots"]
+layout_mode = 2
+custom_minimum_size = Vector2(111, 20)
+modulate = Color(0.5, 0.5, 0.5, 0.6)
+
+[node name="Label" type="Label" parent="WeaponSlots/Slot0"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "[ empty ]"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 11
+
+[node name="Slot1" type="Panel" parent="WeaponSlots"]
+layout_mode = 2
+custom_minimum_size = Vector2(111, 20)
+modulate = Color(0.5, 0.5, 0.5, 0.4)
+
+[node name="Label" type="Label" parent="WeaponSlots/Slot1"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "[ empty ]"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 11
+
 [node name="ScoreLabel" type="Label" parent="."]
 anchor_left = 1.0
 anchor_right = 1.0

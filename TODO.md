@@ -8,28 +8,11 @@
 ---
 
 ## 🔴 IN PROGRESS
-- [ ] Phase 3 - Weapon system
+- [ ] Phase 4 - Card System
 
 ---
 
-## 📋 PHASE 3 - Weapons
-
----
-
-## 📋 PHASE 3 - Weapons
-
-### Weapon System
-- [ ] Weapon data structure (JSON)
-- [ ] Multiple weapon types (Ballistic, Energy, Missile)
-- [ ] Weapon pickup from enemy drops
-- [ ] Weapon slots on ship (2 default)
-- [ ] Switch between weapons
-
-### Weapon Merging
-- [ ] Merge tier system (Tier 1-5)
-- [ ] Merge prompt on duplicate pickup
-- [ ] Damage/fire rate scaling per tier
-- [ ] Visual change per tier
+## 📋 PHASE 4 - Card System
 
 ---
 
@@ -131,6 +114,16 @@
 - [x] Bullet.tscn
 - [x] Enemy1.tscn (Scout Fighter)
 - [x] Main.tscn (playable level)
+
+### Phase 3 - Weapons ✅ COMPLETE
+- [x] WeaponDB autoload — 3 types (Ballistic/Energy/Missile) × 5 tiers with damage/fire rate scaling
+- [x] WeaponPickup.tscn — diamond pickup item, drifts left, auto-collected on player overlap
+- [x] 30% weapon drop on enemy death (all 3 enemy types)
+- [x] Player 2 weapon slots — Shift key switches active slot
+- [x] Auto-merge: picking up same type + tier upgrades to next tier (max T5)
+- [x] Bullet color + speed driven by active weapon
+- [x] HUD weapon slot display — shows active weapon name/tier, color-coded, active slot highlighted
+- [x] EventBus: weapon_equipped, weapon_slot_switched signals
 
 ### Phase 2 - Progression ✅ COMPLETE
 - [x] XP drops from enemies

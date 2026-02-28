@@ -1,6 +1,8 @@
 extends Area2D
 class_name Enemy
 
+const _PICKUP_SCENE = preload("res://scenes/weapons/WeaponPickup.tscn")
+
 @export var enemy_id: String = "basic_enemy"
 @export var max_hp: int = 30
 @export var xp_value: int = 10
@@ -34,7 +36,15 @@ func take_damage(amount: int) -> void:
 
 func die() -> void:
 	EventBus.enemy_died.emit(enemy_id, xp_value)
+	_try_drop_weapon()
 	queue_free()
+
+func _try_drop_weapon() -> void:
+	if randf() < 0.3:
+		var pickup = _PICKUP_SCENE.instantiate()
+		pickup.weapon_type = WeaponDB.random_weapon()["type"]
+		pickup.global_position = global_position
+		get_tree().root.add_child(pickup)
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is Player:

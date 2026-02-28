@@ -45,6 +45,7 @@ config/icon="res://icon.svg"
 
 EventBus="*uid://dbd1co8e5wu6m"
 GameManager="*uid://rk6wbj42n13h"
+WeaponDB="*res://scripts/weapons/WeaponDB.gd"
 
 [display]
 

@@ -3,8 +3,10 @@ class_name Bullet
 
 @export var speed: float = 800.0
 @export var damage: int = 10
+@export var bullet_color: Color = Color(1.0, 0.9, 0.1, 1.0)
 
 func _ready() -> void:
+	$Visual.color = bullet_color
 	area_entered.connect(_on_area_entered)
 
 func _process(delta: float) -> void:
