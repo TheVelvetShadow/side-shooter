@@ -19,7 +19,8 @@
     "rate_scale": 0.16,
     "xp_thresholds": [50, 150, 300, 500],
     "burn_pct": 0.10,
-    "burn_duration": 1.0
+    "burn_duration": 1.0,
+    "aoe_radius": 80.0
   },
   "missile": {
     "name": "Missile",
@@ -31,7 +32,21 @@
     "rate_scale": 0.16,
     "xp_thresholds": [50, 150, 300, 500],
     "burn_pct": 0.02,
-    "burn_duration": 1.0
+    "burn_duration": 1.0,
+    "aoe_radius": 120.0
+  },
+  "nuke": {
+    "name": "Nuke",
+    "base_damage": 200,
+    "base_fire_rate": 1.00,
+    "bullet_speed": 500.0,
+    "color": [1.0, 1.0, 0.9, 1.0],
+    "dmg_scale": 0.44,
+    "rate_scale": 0.10,
+    "xp_thresholds": [50, 150, 300, 500],
+    "burn_pct": 0.75,
+    "burn_duration": 5.0,
+    "aoe_radius": 350.0
   },
   "heavy_machine_gun": {
     "name": "HMG",
