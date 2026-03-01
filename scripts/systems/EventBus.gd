@@ -9,6 +9,7 @@ signal player_hp_changed(current: int, maximum: int)
 
 # Weapon signals
 signal bullet_fired(bullet_data: Dictionary)
+signal bullet_bounced(bullet: Bullet, bounce_number: int)
 signal weapon_picked_up(weapon_id: String)
 signal weapon_merged(weapon_id: String, new_tier: int)
 signal weapon_equipped(slot: int, weapon_data: Dictionary)

@@ -66,6 +66,12 @@ func fire() -> void:
 		fire_timer.wait_time = fire_rate
 	bullet.global_position = bullet_spawn.global_position
 	get_tree().root.add_child(bullet)
+	# Aim toward crosshair (overrides the default horizontal velocity set in _ready)
+	var crosshairs := get_tree().get_nodes_in_group("crosshair")
+	if crosshairs.size() > 0:
+		var to_target: Vector2 = (crosshairs[0] as Node2D).global_position - bullet_spawn.global_position
+		if to_target.length() > 1.0:
+			bullet.velocity = to_target.normalized() * bullet.speed
 	EventBus.bullet_fired.emit({"position": bullet_spawn.global_position})
 	fire_timer.start()
 
