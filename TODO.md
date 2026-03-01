@@ -116,7 +116,7 @@ _(nothing)_
 ### 📋 New Weapon Systems Required
 > Design complete in game_data.xlsx. Implement systems to unlock these weapons.
 
-- [ ] **Heavy Machine Gun** — no new systems, add to weapons.json now
+- [x] **Heavy Machine Gun** — added to weapons.json (ballistic, dmg 14, rate 0.25, speed 700, silver)
 - [ ] **DOT / Burn** — on hit: apply burn timer, tick = hit_dmg × burn_pct; affects Energy Beam, Missile, Napalm, Nuke
 - [ ] **AOE explosion** — on bullet death: damage all enemies in radius; affects Nuke, Cluster Bomb, Napalm
 - [ ] **Homing** — bullet steers toward nearest enemy each frame; affects Homing Missile
