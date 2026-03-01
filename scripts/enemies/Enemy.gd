@@ -2,6 +2,7 @@ extends Area2D
 class_name Enemy
 
 const _PICKUP_SCENE = preload("res://scenes/weapons/WeaponPickup.tscn")
+const _GEM_SCENE    = preload("res://scenes/pickups/EnergyGem.tscn")
 
 @export var enemy_id: String = "basic_enemy"
 @export var max_hp: int = 30
@@ -29,15 +30,23 @@ func _process(delta: float) -> void:
 	if global_position.x < -64.0:
 		queue_free()
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, source_slot: int = -1) -> void:
 	current_hp -= amount
 	if current_hp <= 0:
-		die()
+		die(source_slot)
 
-func die() -> void:
+func die(source_slot: int = -1) -> void:
 	EventBus.enemy_died.emit(enemy_id, xp_value)
+	_drop_gem(source_slot)
 	_try_drop_weapon()
 	queue_free()
+
+func _drop_gem(source_slot: int) -> void:
+	var gem = _GEM_SCENE.instantiate()
+	gem.xp_value = xp_value
+	gem.source_weapon_slot = source_slot
+	gem.global_position = global_position
+	get_tree().root.add_child(gem)
 
 func _try_drop_weapon() -> void:
 	if randf() < 0.3:

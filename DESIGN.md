@@ -17,24 +17,51 @@ A roguelike horizontal space shooter with bullet-bouncing mechanics and a Balatr
 
 ## 2. Core Run Structure (The Ante Loop)
 
-The run is structured in Antes, each containing 3 levels. This mirrors Balatro's ante system.
+A single **run** spans **3 Antes**. Target run time: 20–25 minutes. Antes 4–8 are meta-progression unlocks, not played in a single run.
 
 ```
-ANTE 1
-  └── Level 1 (wave) → Shop → Level 2 (wave) → Shop → Level 3 (Boss)
-                                                              ↓
-ANTE 2 (harder enemies, better cards available in pool)
-  └── Level 1 → Shop → Level 2 → Shop → Level 3 (Boss)
-                                                              ↓
-ANTE 3 ...
+RUN (3 Antes, ~20-25 min)
+│
+├── ANTE 1
+│     ├── Level 1 → Small Boss → Pilot Academy
+│     ├── Level 2 → Small Boss → Pilot Academy
+│     └── Level 3 → BIG BOSS  → Pilot Academy → Next Ante
+│
+├── ANTE 2 (1.5× HP, 1.2× speed — harder enemies, better pilots in pool)
+│     ├── Level 1 → Small Boss → Pilot Academy
+│     ├── Level 2 → Small Boss → Pilot Academy
+│     └── Level 3 → BIG BOSS  → Pilot Academy → Next Ante
+│
+└── ANTE 3 (2.5× HP, 1.4× speed)
+      ├── Level 1 → Small Boss → Pilot Academy
+      ├── Level 2 → Small Boss → Pilot Academy
+      └── Level 3 → BIG BOSS  → Pilot Academy
+                                      ↓
+                                Run Complete
 ```
+
+Antes 4–8 unlock via Pilot Academy and are available in future runs as harder starting difficulties.
 
 **Key rules:**
 - All pilot upgrades and weapon tiers persist for the full run
-- The shop appears between every level — pilots can be swapped or bought here
+- The shop appears between every level — pilots can be bought/swapped, weapons merged
 - Boss kills gate progression to the next Ante
-- Unlocks earned (ships, pilots, weapons) persist across runs via meta-progression (Pilot Academy)
-- Enemy kills drop **Energy** (the in-game resource); Energy is collected and spent mid-run on weapon tier upgrades OR ship stat upgrades via a pause menu
+- Unlocks earned (ships, pilots, weapons) persist across runs via Pilot Academy
+
+### Energy (the in-run resource)
+
+Enemies drop **Energy gems** as physical pickups when they die. The player collects them by moving over them (not instant — requires positioning).
+
+Energy has two uses:
+1. **Weapon XP** — collected Energy auto-allocates to active weapons, filling their XP bars → at threshold, game pauses and player chooses from 3 upgrade options (weapon tier-ups or stat boosts)
+2. **Pilot Academy currency** — accumulated Energy is spent in the Pilot Academy on Pilots, weapon merging, or ship stat upgrades
+
+Same pool, two uses. The gem is the satisfying physical manifestation of both.
+
+**Weapon merging** happens in the Pilot Academy (between levels), not mid-combat:
+- Two weapons of the same type + same tier → merge → next tier (costs Energy)
+- Tension: merge for immediate power spike vs. spend on a Pilot for build synergy
+- XP-driven tier-up is player-choice (upgrade menu) — merging is an optional accelerator
 
 ---
 
@@ -56,9 +83,9 @@ Three categories, each with distinct behaviour and card synergies:
 - All equipped weapons fire independently on their own timers
 - Weapons do not directly interact mid-flight — interaction happens through shared card modifiers
 
-### 3.3 Weapon Tiers (XP-Driven Merging)
+### 3.3 Weapon Tiers (XP-Driven, Player-Choice)
 
-Weapons upgrade through 5 tiers. Tiers are reached via XP thresholds — **merging is automatic when a weapon accumulates enough XP**, not triggered by finding duplicates.
+Weapons upgrade through 5 tiers. Tiers are reached via XP thresholds — when a weapon's XP bar fills, the game **pauses and presents 3 upgrade options** (weapon tier-ups for eligible weapons, stat boosts as filler). The player picks one. No auto-tier occurs without player input.
 
 ```
 Tier 1 → Tier 2 → Tier 3 → Tier 4 → Tier 5
@@ -66,7 +93,7 @@ Tier 1 → Tier 2 → Tier 3 → Tier 4 → Tier 5
 
 Each tier improves base stats according to per-weapon scaling profiles defined in `weapons_prototype.xlsx`. Different weapons scale differently — e.g. Shotgun emphasises projectile count growth, Laser emphasises fire rate.
 
-Tier upgrades happen **mid-level** as XP is earned, creating reactive feedback during combat (distinct from the strategic card layer at the shop).
+The upgrade choice moment is the mid-level reward beat — distinct from the strategic Pilot Academy layer between levels.
 
 ### 3.4 Weapon Scaling Formula (Base Stats Only)
 
@@ -90,7 +117,7 @@ Lore framing: each Pilot card represents a specialist who joins your squad — t
 
 ### 4.2 Pilot Acquisition
 
-- Pilots are available to buy/swap in the shop after every level
+- Pilots are available to buy/swap in the **Pilot Academy** after every level (all 3 levels per ante)
 - Rarer pilots become available in higher Antes
 - Pilots are unlocked into the pool via meta-progression (Pilot Academy) — not all pilots are available from run 1
 - The player holds a limited active pilot roster (target: ~5 active pilots)
@@ -228,30 +255,32 @@ Each ship has five base stats that define its identity. These are fixed at run s
 | **Armour** | Flat damage reduction per hit |
 | **Weapon Bonus** | Flat addition to all weapon damage (feeds into pilot multiplier chain) |
 
-### 7.2 Available Ships (Meta-Unlocked)
+### 8.2 Ship Unlock Progression
 
-8 ships total. Exact stats TBD in spreadsheet — architecture defined here:
+Ships unlock permanently by completing Antes for the first time — **no cost, no currency**. Like Balatro's deck unlocks: you earn them by playing, and they're yours forever.
 
-| Ship | Style | Unlock |
+| Ship | Style | Unlock condition |
 |---|---|---|
-| Interceptor | Balanced starter | Available from run 1 |
-| Tank | High HP, low speed, high armour | Pilot Academy |
-| Glass Cannon | Max weapon bonus, fragile (low HP) | Pilot Academy |
-| Scout | High speed, dodge-focused | Pilot Academy |
-| Dreadnought | Slow, maximum weapon slots | Pilot Academy |
-| TBD 6 | — | Pilot Academy |
-| TBD 7 | — | Pilot Academy |
-| TBD 8 | — | Pilot Academy |
+| Interceptor | Balanced starter | Always available |
+| Tank | High HP, high armour, low speed | Complete Ante 1 (first time) |
+| Glass Cannon | Max weapon bonus, fragile | Complete Ante 2 (first time) |
+| Scout | High speed, dodge-focused | Complete Ante 3 / first run |
+| Dreadnought | Slow, maximum weapon slots | Complete Ante 4 (first time) |
+| TBD 6 | — | Complete Ante 5 (first time) |
+| TBD 7 | — | Complete Ante 6 (first time) |
+| TBD 8 | — | Complete Ante 7 (first time) |
+
+First-time ante completion is tracked in persistent save data. Replaying an ante does not re-lock or re-unlock ships — once unlocked, always available.
 
 Ship selection happens before a run starts. Ship stats influence pilot synergy (e.g. Glass Cannon + conditional damage pilots; Dreadnought + weapon-type pilots across many slots).
 
-### 7.3 Mid-Run Ship Upgrades
+### 8.3 Mid-Run Ship Upgrades
 
-Energys collected mid-run can be spent on either:
-- **Weapon tier upgrades** — advance a weapon's XP threshold
-- **Ship stat upgrades** — increase one of the five ship stats for the remainder of the run
+Energy collected mid-run can be spent on:
+- **Weapon XP** — auto-fills weapon XP bars → tier-up at thresholds
+- **Ship stat upgrades** — increase one of the five ship stats for the remainder of the run (run-scoped, resets at run end)
 
-Ship upgrades gained mid-run are run-scoped only — they reset at run end. Permanent ship stat growth is meta-only (Pilot Academy).
+Permanent ship stat growth does not exist — ships are defined by their base stats and are balanced against each other, not upgraded over time.
 
 ---
 
@@ -259,18 +288,19 @@ Ship upgrades gained mid-run are run-scoped only — they reset at run end. Perm
 
 The Pilot Academy is the between-run hub. It is **not a priority until core gameplay loop is complete.**
 
-Three unlock tracks — all gated behind Pilot Academy progress:
+### Unlock tracks
 
-| Track | What unlocks |
+| Track | How it unlocks |
 |---|---|
-| **Ships** | 7 ships beyond the starter Interceptor |
-| **Weapons** | Additional weapon types added to the run pool |
-| **Pilots** | New pilot cards added to the shop pool (100+ total) |
+| **Ships** | Completing an Ante for the first time (no cost) |
+| **Weapons** | Completing runs / reaching milestones (TBD) |
+| **Pilots** | Completing runs / reaching milestones (TBD) |
 
-- Run XP persists to the Academy and funds unlocks
-- Permanent ship stat upgrades available (small, not run-defining)
-- All unlocks carry into every future run
-- The active pilot pool in any given run is limited to what has been unlocked so far — early runs have fewer pilots available, increasing build variety as the player progresses
+### Key rules
+- Ship unlocks are **completion-gated, not currency-gated** — play to unlock, not grind
+- First-time ante completions are saved permanently; replaying does not change unlock state
+- Pilot pool available in a run grows as more pilots are unlocked — early runs have fewer options
+- No permanent stat upgrades — ships are balanced as fixed archetypes
 
 ---
 
@@ -302,18 +332,25 @@ Layer 8 — Enemy bullets
 
 These are not open questions. Do not revisit without flagging explicitly:
 
-- Weapons tier up via XP thresholds, not duplicate collection
+- **Run = 3 Antes** (~20–25 min). Antes 4–8 are meta-unlocked harder difficulties, not in a single run
+- **Ante structure**: L1 → Small Boss → Pilot Academy → L2 → Small Boss → Pilot Academy → L3 → Big Boss → Pilot Academy → Next Ante
+- **Every level ends with a boss** (L1 & L2 = Small Boss, L3 = Big Boss); every boss clear → Pilot Academy
+- Weapons tier up via XP thresholds (**player-choice upgrade menu** — not automatic) AND via merging (Pilot Academy only)
+- Weapon upgrade menu: XP fills → pause → 3 options shown (weapon tier-ups + stat boosts) → player picks one
+- Weapon merging: same type + same tier → next tier, costs Energy — optional accelerator, Pilot Academy only
+- **Energy gems** are physical pickups dropped by enemies — collected by moving over them (not instant)
+- Energy = single resource: fills weapon XP bars (→ player-choice upgrade) AND accumulates as Pilot Academy currency
 - "Cards" are called **Pilots** — Global / Weapon Type / Conditional — all three types in the pool
+- Pilots are **Joker-style passives only** — no one-use Planet/Tarot cards
+- **Ship stat upgrades** in the Pilot Academy are run-scoped only (reset between runs, not permanent)
 - Order of operations: Flat (incl. ship bonus) → Type × → Conditional × → Combo ×
 - 4–6 simultaneous weapon slots (ship-dependent)
-- Ante structure: 3 levels per ante, shop between each, boss at end
 - Bounce is a base mechanic, not a pilot unlock
 - Bounce-conditional pilots are a design priority and a unique game identity
 - Pilot UI must show the damage chain visibly (Balatro-style running total)
 - Data for weapons, pilots, and ships lives in spreadsheets, not hardcoded in scripts
-- Pilots are available **shop only** (between levels) — never mid-run drops
-- Energys dropped by enemies can be spent mid-run on **weapon tiers OR ship stats**
-- 8 ships total, all (except Interceptor) unlocked via Pilot Academy
+- Pilots available **Pilot Academy only** (between levels) — never mid-run drops
+- 8 ships total — unlocked by completing Antes for the first time (no cost, like Balatro decks)
 - 100+ pilots in pool, unlocked progressively via Pilot Academy
 - Weapons also locked/unlocked via Pilot Academy — not all available from run 1
 

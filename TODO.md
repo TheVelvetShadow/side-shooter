@@ -9,7 +9,7 @@
 ---
 
 ## 🔴 IN PROGRESS
-_(nothing — assess design gaps before picking next task)_
+_(nothing)_
 
 ---
 
@@ -18,7 +18,10 @@ _(nothing — assess design gaps before picking next task)_
 - [x] **Weapon slots: 2 → 4–6 simultaneous** — Player now has MAX_SLOTS=6, all fire independently via per-slot delta timers. `unlocked_slots` starts at 2, expandable.
 - [x] **Weapon tier progression: duplicate pickup → XP-driven** — Per-slot `weapon_xp[]` tracking. Bullets carry `weapon_slot`, emit `weapon_xp_gained` on kill. Tier-up auto on threshold.
 - [x] **Weapon stats: hardcoded → data-driven** — `data/weapons.json` is source of truth. WeaponDB loads JSON, scales via formula `base × (1 + dmg_scale)^(tier-1)`. Update JSON from xlsx when ready.
-- [x] **LevelUpUI / card conflation** — Clarified: LevelUpUI = stat upgrades only. Pilots come from Shop (Phase C).
+- [x] **LevelUpUI / card conflation** — Clarified: LevelUpUI = stat upgrades only. Pilots come from Pilot Academy (Phase C).
+- [x] **Weapon auto-tier → player-choice upgrade menu** — `_check_tier_up` now emits `weapon_upgrade_available(slot)`. WeaponUpgradeUI pauses game and shows 3 options. Player picks → `upgrade_weapon_choice(slot)` applies tier-up.
+- [x] **Shop renamed → Pilot Academy** — Appears after every level (all 3), not just between levels.
+- [x] **Boss every level** — L1 & L2 end with Small Boss; L3 ends with Big Boss. (Boss implementation: Phase F)
 
 ---
 
@@ -45,21 +48,24 @@ _(nothing — assess design gaps before picking next task)_
 - [x] Ante progression: 3 levels per ante, `ante_completed` signal, ante counter increments
 - [x] Difficulty scaling: HP/speed multipliers per ante applied to each enemy on spawn
 - [x] HUD: Ante/Level label + "LEVEL COMPLETE" overlay
-- [x] 3-second auto-advance placeholder (replaced by Shop in Phase C)
-- [ ] Boss at Ante end (Phase F)
+- [x] 3-second auto-advance placeholder (replaced by Pilot Academy in Phase C)
+- [ ] Small Boss after L1 & L2 (Phase F)
+- [ ] Big Boss after L3 (Phase F)
 
 ---
 
-## 📋 PHASE C — Shop Scene
+## 📋 PHASE C — Pilot Academy Scene
 
-> "The shop appears between every level." — DESIGN.md §2
+> "The Pilot Academy opens after every level." — DESIGN.md §2 (revised)
+> Replaces the 3-second placeholder in LevelManager.
 
-- [ ] `Shop.tscn` scene — appears between levels
-- [ ] Shop offers 3–5 cards to buy (drawn from card pool by rarity)
-- [ ] Card swap — player can replace an active card with a shop card
-- [ ] Shop also offers weapon slot unlocks (up to 6 slots)
+- [ ] `PilotAcademy.tscn` scene — appears after every level (all 3 per ante)
+- [ ] Offers 3–5 pilot cards to buy (drawn from pilot pool by rarity)
+- [ ] Pilot swap — player can replace an active pilot with an Academy pilot
+- [ ] Ship stat upgrades — run-scoped only (HP, speed, weapon slots, armour, weapon bonus); reset at run end
+- [ ] Weapon merging — same type + same tier → next tier, costs Energy
 - [ ] Skip button to proceed without buying
-- [ ] Shop funded by run XP / currency (design TBD — flag if needed)
+- [ ] Funded by `shop_energy` accumulated in GameManager
 
 ---
 
@@ -97,13 +103,27 @@ _(nothing — assess design gaps before picking next task)_
 
 ---
 
+## ✅ PHASE E+ — Energy Gem Pickup — COMPLETE
+
+- [x] `scenes/pickups/EnergyGem.tscn` — pulsing diamond, drifts left, magnets to player at 250px range
+- [x] Gem carries `xp_value` + `source_weapon_slot` from the kill shot
+- [x] All 3 enemy types drop a gem on death (always), passing source_slot through take_damage → die
+- [x] Bounce multiplier now applied in KamikazeDrone and TurretPlatform area_entered handlers
+- [x] `EventBus.energy_collected(amount, weapon_slot)` — Player listens → weapon XP per slot → tier-up
+- [x] `EventBus.energy_changed(total)` — GameManager accumulates `shop_energy` for future Shop spend
+- [x] HUD: ⚡ energy counter top-right, teal colour
+
+---
+
 ## ✅ PHASE E — Weapon System Rework — COMPLETE
 
 - [x] `data/weapons.json` — weapon base stats + scale % (replace hardcoded WeaponDB)
 - [x] WeaponDB loads from JSON, formula-based tier scaling
 - [x] 6 weapon slots (MAX_SLOTS=6), all fire simultaneously on independent delta timers
 - [x] Per-slot weapon XP — bullets carry weapon_slot, emit weapon_xp_gained on kill
-- [x] Auto tier-up at XP thresholds, weapon_tiered_up signal emitted
+- [x] XP threshold → emit `weapon_upgrade_available(slot)` (was: auto tier-up)
+- [x] `WeaponUpgradeUI` — pauses game, shows 3 options, player picks → `upgrade_weapon_choice(slot)`
+- [x] `EventBus.weapon_upgrade_available` + `weapon_upgrade_chosen` signals added
 - [x] HUD: 6 weapon panels built dynamically, each with name label + XP progress bar
 - [x] Removed duplicate-pickup merge mechanic
 - [ ] Weapon tier-up visual feedback (flash/particle) — polish phase
@@ -112,12 +132,16 @@ _(nothing — assess design gaps before picking next task)_
 
 ## 📋 PHASE F — Boss Enemies
 
-- [ ] Boss base class — high HP, multiple attack phases
-- [ ] Boss 1: Fortress Station (Ante 1 finale)
-- [ ] Boss 2: Battlecruiser (Ante 2 finale)
-- [ ] Boss 3: Mothership (Ante 3 finale)
+> Required for every level: L1 & L2 end with Small Boss; L3 ends with Big Boss.
+
+- [ ] Small Boss base class — moderately high HP, 1–2 attack patterns
+- [ ] Big Boss base class — high HP, multiple attack phases
+- [ ] Small Boss variant 1 (Ante 1 L1 & L2)
+- [ ] Boss 1: Fortress Station (Ante 1 L3 — Big Boss)
+- [ ] Boss 2: Battlecruiser (Ante 2 L3 — Big Boss)
+- [ ] Boss 3: Mothership (Ante 3 L3 — Big Boss)
 - [ ] Boss health bar HUD element
-- [ ] Boss death → ante clear → unlock next ante
+- [ ] Boss death → trigger Pilot Academy → next level / ante
 
 ---
 

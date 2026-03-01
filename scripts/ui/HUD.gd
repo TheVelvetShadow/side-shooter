@@ -24,6 +24,7 @@ func _ready() -> void:
 	EventBus.weapon_xp_updated.connect(_on_weapon_xp_updated)
 	EventBus.level_started.connect(_on_level_started)
 	EventBus.level_completed.connect(_on_level_completed)
+	EventBus.energy_changed.connect(_on_energy_changed)
 	for child in $CardSlots.get_children():
 		_upgrade_slot_panels.append(child as Panel)
 	_build_weapon_panels()
@@ -81,7 +82,7 @@ func _on_upgrade_chosen(upgrade_id: String) -> void:
 	if _filled_slots >= _upgrade_slot_panels.size():
 		return
 	var slot := _upgrade_slot_panels[_filled_slots]
-	var display := UPGRADE_DISPLAY.get(upgrade_id, {"label": upgrade_id, "color": Color.WHITE})
+	var display: Dictionary = UPGRADE_DISPLAY.get(upgrade_id, {"label": upgrade_id, "color": Color.WHITE})
 	slot.modulate = display["color"]
 	slot.get_node("Label").text = display["label"]
 	_filled_slots += 1
@@ -116,6 +117,9 @@ func _on_weapon_xp_updated(slot: int, current_xp: int, max_xp: int) -> void:
 func _on_level_started(ante: int, level_in_ante: int) -> void:
 	$AnteLabel.text = "Ante %d  •  Level %d" % [ante, level_in_ante]
 	$LevelCompleteLabel.hide()
+
+func _on_energy_changed(total: int) -> void:
+	$EnergyLabel.text = "⚡ %d" % total
 
 func _on_level_completed(ante: int, level_in_ante: int) -> void:
 	$LevelCompleteLabel.text = "ANTE %d  LEVEL %d\nCOMPLETE" % [ante, level_in_ante]

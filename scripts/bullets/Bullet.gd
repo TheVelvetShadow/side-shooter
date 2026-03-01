@@ -45,6 +45,5 @@ func _on_area_entered(area: Area2D) -> void:
 		var final_damage := damage
 		if bounces_done > 0:
 			final_damage = int(damage * bounce_damage_multiplier)
-		area.take_damage(final_damage)
-		EventBus.weapon_xp_gained.emit(weapon_slot, (area as Enemy).xp_value)
+		area.take_damage(final_damage, weapon_slot)
 		queue_free()

@@ -27,7 +27,9 @@ func _ready() -> void:
 		slot_timers.append(0.0)
 		weapon_xp.append(0)
 	add_to_group("player")
-	EventBus.weapon_xp_gained.connect(_on_weapon_xp_gained)
+	EventBus.energy_collected.connect(_on_energy_collected)
+	# Start with a basic weapon in slot 0
+	equip_weapon(WeaponDB.get_weapon("ballistic", 1))
 
 func _physics_process(delta: float) -> void:
 	_handle_movement()
@@ -82,7 +84,7 @@ func equip_weapon(weapon_data: Dictionary) -> void:
 			return
 	# All slots full — replace the lowest-tier weapon if new one is stronger
 	var weakest_slot := 0
-	var weakest_tier := weapon_slots[0]["tier"]
+	var weakest_tier: int = weapon_slots[0]["tier"]
 	for i in range(1, unlocked_slots):
 		if weapon_slots[i]["tier"] < weakest_tier:
 			weakest_tier = weapon_slots[i]["tier"]
@@ -93,7 +95,7 @@ func equip_weapon(weapon_data: Dictionary) -> void:
 		slot_timers[weakest_slot] = 0.0
 		EventBus.weapon_equipped.emit(weakest_slot, weapon_data)
 
-func _on_weapon_xp_gained(slot: int, amount: int) -> void:
+func _on_energy_collected(amount: int, slot: int) -> void:
 	if slot < 0 or slot >= unlocked_slots or weapon_slots[slot] == null:
 		return
 	weapon_xp[slot] += amount
@@ -111,10 +113,18 @@ func _check_tier_up(slot: int) -> void:
 		return
 	var thresholds: Array = weapon.get("xp_thresholds", [50, 150, 300, 500])
 	if weapon_xp[slot] >= thresholds[tier - 1]:
-		weapon_slots[slot] = WeaponDB.get_weapon(weapon["type"], tier + 1)
-		weapon_xp[slot] = 0
-		EventBus.weapon_equipped.emit(slot, weapon_slots[slot])
-		EventBus.weapon_tiered_up.emit(slot, weapon_slots[slot])
+		EventBus.weapon_upgrade_available.emit(slot)
+
+func upgrade_weapon_choice(slot: int) -> void:
+	var weapon: Dictionary = weapon_slots[slot]
+	var tier: int = weapon["tier"]
+	if tier >= 5:
+		return
+	weapon_slots[slot] = WeaponDB.get_weapon(weapon["type"], tier + 1)
+	weapon_xp[slot] = 0
+	EventBus.weapon_equipped.emit(slot, weapon_slots[slot])
+	EventBus.weapon_tiered_up.emit(slot, weapon_slots[slot])
+	EventBus.weapon_upgrade_chosen.emit(slot)
 
 func unlock_slot() -> void:
 	if unlocked_slots < MAX_SLOTS:

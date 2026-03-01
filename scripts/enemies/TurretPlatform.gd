@@ -2,6 +2,7 @@ extends Area2D
 class_name TurretPlatform
 
 const _PICKUP_SCENE = preload("res://scenes/weapons/WeaponPickup.tscn")
+const _GEM_SCENE    = preload("res://scenes/pickups/EnergyGem.tscn")
 
 @export var enemy_id: String = "turret"
 @export var max_hp: int = 50
@@ -42,15 +43,23 @@ func _on_fire_timer() -> void:
 	b.direction = (_player.global_position - global_position).normalized()
 	get_tree().root.add_child(b)
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, source_slot: int = -1) -> void:
 	current_hp -= amount
 	if current_hp <= 0:
-		die()
+		die(source_slot)
 
-func die() -> void:
+func die(source_slot: int = -1) -> void:
 	EventBus.enemy_died.emit(enemy_id, xp_value)
+	_drop_gem(source_slot)
 	_try_drop_weapon()
 	queue_free()
+
+func _drop_gem(source_slot: int) -> void:
+	var gem = _GEM_SCENE.instantiate()
+	gem.xp_value = xp_value
+	gem.source_weapon_slot = source_slot
+	gem.global_position = global_position
+	get_tree().root.add_child(gem)
 
 func _try_drop_weapon() -> void:
 	if randf() < 0.3:
@@ -61,5 +70,9 @@ func _try_drop_weapon() -> void:
 
 func _on_area_entered(area: Area2D) -> void:
 	if area is Bullet:
-		take_damage(area.damage)
+		var b := area as Bullet
+		var dmg: int = b.damage
+		if b.bounces_done > 0:
+			dmg = int(dmg * b.bounce_damage_multiplier)
+		take_damage(dmg, b.weapon_slot)
 		area.queue_free()

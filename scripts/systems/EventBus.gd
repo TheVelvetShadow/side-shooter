@@ -13,12 +13,17 @@ signal bullet_bounced(bullet: Bullet, bounce_number: int)
 signal weapon_picked_up(weapon_id: String)
 signal weapon_equipped(slot: int, weapon_data: Dictionary)
 signal weapon_tiered_up(slot: int, weapon_data: Dictionary)
-signal weapon_xp_gained(slot: int, amount: int)
 signal weapon_xp_updated(slot: int, current_xp: int, max_xp: int)
+signal weapon_upgrade_available(slot: int)
+signal weapon_upgrade_chosen(slot: int)
 
 # Enemy signals
 signal enemy_died(enemy_id: String, xp_value: int)
 signal enemy_spawned(enemy_id: String)
+
+# Energy / pickup signals
+signal energy_collected(amount: int, weapon_slot: int)
+signal energy_changed(total: int)
 
 # XP / progression signals
 signal xp_gained(amount: int)
