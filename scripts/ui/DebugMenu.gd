@@ -95,6 +95,11 @@ func _build_ui() -> void:
 	_god_btn.pressed.connect(_toggle_god_mode)
 	row2.add_child(_god_btn)
 
+	var unlock_btn := Button.new()
+	unlock_btn.text = "Unlock All Slots"
+	unlock_btn.pressed.connect(_unlock_all_slots)
+	row2.add_child(unlock_btn)
+
 	var kill_btn := Button.new()
 	kill_btn.text = "Kill All Enemies"
 	kill_btn.pressed.connect(_kill_all_enemies)
@@ -130,7 +135,36 @@ func _equip_weapon(type: String, tier: int) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Player
 	if player == null:
 		return
-	player.equip_weapon(WeaponDB.get_weapon(type, tier))
+	var weapon := WeaponDB.get_weapon(type, tier)
+	# Find an empty slot
+	for i in player.unlocked_slots:
+		if player.weapon_slots[i] == null:
+			player.weapon_slots[i] = weapon
+			player.weapon_xp[i] = 0
+			player.slot_timers[i] = 0.0
+			EventBus.weapon_equipped.emit(i, weapon)
+			return
+	# All current slots full — unlock next one if available
+	if player.unlocked_slots < Player.MAX_SLOTS:
+		player.unlock_slot()
+		var slot := player.unlocked_slots - 1
+		player.weapon_slots[slot] = weapon
+		player.weapon_xp[slot] = 0
+		player.slot_timers[slot] = 0.0
+		EventBus.weapon_equipped.emit(slot, weapon)
+		return
+	# All 6 slots full — overwrite slot 0 (debug, no tier check)
+	player.weapon_slots[0] = weapon
+	player.weapon_xp[0] = 0
+	player.slot_timers[0] = 0.0
+	EventBus.weapon_equipped.emit(0, weapon)
+
+func _unlock_all_slots() -> void:
+	var player := get_tree().get_first_node_in_group("player") as Player
+	if player == null:
+		return
+	while player.unlocked_slots < Player.MAX_SLOTS:
+		player.unlock_slot()
 
 func _add_credits() -> void:
 	GameManager.credits += 500
