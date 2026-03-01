@@ -7,6 +7,8 @@ func _ready() -> void:
 	var crosshair := Node2D.new()
 	crosshair.set_script(CrosshairScript)
 	add_child(crosshair)
+	GameManager.start_run("interceptor")
+	LevelManager.start_run()
 
 func _on_game_over() -> void:
 	get_tree().change_scene_to_file("res://scenes/ui/GameOver.tscn")

@@ -1,7 +1,6 @@
 extends Node
 
 # --- Run State ---
-var current_level: int = 1
 var run_active: bool = false
 var current_ship_id: String = "interceptor"
 
@@ -26,8 +25,6 @@ func start_run(ship_id: String) -> void:
 	run_xp = 0
 	ship_level = 1
 	ship_xp = 0
-	current_level = 1
-	EventBus.level_started.emit(current_level)
 
 func end_run(victory: bool) -> void:
 	run_active = false

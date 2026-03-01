@@ -32,6 +32,31 @@ offset_right = 620.0
 offset_bottom = 96.0
 theme_override_constants/separation = 4
 
+[node name="AnteLabel" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120.0
+offset_top = 8.0
+offset_right = 120.0
+offset_bottom = 36.0
+text = "Ante 1  •  Level 1"
+horizontal_alignment = 1
+
+[node name="LevelCompleteLabel" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -36.0
+offset_right = 200.0
+offset_bottom = 36.0
+text = "LEVEL COMPLETE"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 48
+visible = false
+
 [node name="ScoreLabel" type="Label" parent="."]
 anchor_left = 1.0
 anchor_right = 1.0

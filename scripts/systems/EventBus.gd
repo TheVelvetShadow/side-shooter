@@ -27,7 +27,10 @@ signal ship_levelled_up(new_level: int)
 signal upgrade_chosen(upgrade_id: String)
 
 # Game state signals
-signal level_started(level_number: int)
-signal level_completed(level_number: int)
+signal level_started(ante: int, level_in_ante: int)
+signal level_completed(ante: int, level_in_ante: int)
+signal ante_completed(ante: int)
+signal wave_spawned(wave_index: int)
+signal waves_exhausted()
 signal game_over()
 signal run_completed()

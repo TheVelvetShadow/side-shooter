@@ -37,16 +37,16 @@ _(nothing — assess design gaps before picking next task)_
 
 ---
 
-## 📋 PHASE B — Ante / Level Structure
+## ✅ PHASE B — Ante / Level Structure — COMPLETE
 
-> "3 levels per ante, shop between each, boss at end" — DESIGN.md §2
-
-- [ ] `LevelManager` autoload — tracks current Ante, level within ante, level state
-- [ ] Finite wave system: each level has a defined number of waves; level ends when all waves cleared
-- [ ] Level completion detection — signal `level_completed` (already in EventBus)
-- [ ] Ante progression — completing level 3 of an ante unlocks next ante
-- [ ] Difficulty scaling per ante (enemy HP/speed/count multipliers)
-- [ ] Level state machine: PLAYING → WAVE_CLEAR → SHOP → NEXT_LEVEL → BOSS → ANTE_CLEAR
+- [x] `LevelManager` autoload — state machine: IDLE → PLAYING → CLEARING → COMPLETE
+- [x] Finite waves: 4 waves/level, EnemySpawner stops on `waves_exhausted`, restarts on `level_started`
+- [x] Level completion: `active_enemies` tracked via `enemy_spawned`/`enemy_died`; completes when CLEARING + 0 enemies
+- [x] Ante progression: 3 levels per ante, `ante_completed` signal, ante counter increments
+- [x] Difficulty scaling: HP/speed multipliers per ante applied to each enemy on spawn
+- [x] HUD: Ante/Level label + "LEVEL COMPLETE" overlay
+- [x] 3-second auto-advance placeholder (replaced by Shop in Phase C)
+- [ ] Boss at Ante end (Phase F)
 
 ---
 

@@ -22,6 +22,8 @@ func _ready() -> void:
 	EventBus.upgrade_chosen.connect(_on_upgrade_chosen)
 	EventBus.weapon_equipped.connect(_on_weapon_equipped)
 	EventBus.weapon_xp_updated.connect(_on_weapon_xp_updated)
+	EventBus.level_started.connect(_on_level_started)
+	EventBus.level_completed.connect(_on_level_completed)
 	for child in $CardSlots.get_children():
 		_upgrade_slot_panels.append(child as Panel)
 	_build_weapon_panels()
@@ -110,6 +112,14 @@ func _on_weapon_xp_updated(slot: int, current_xp: int, max_xp: int) -> void:
 	var xp_bar := _weapon_panels[slot].get_node("XPBar") as ProgressBar
 	xp_bar.max_value = max_xp
 	xp_bar.value = current_xp
+
+func _on_level_started(ante: int, level_in_ante: int) -> void:
+	$AnteLabel.text = "Ante %d  •  Level %d" % [ante, level_in_ante]
+	$LevelCompleteLabel.hide()
+
+func _on_level_completed(ante: int, level_in_ante: int) -> void:
+	$LevelCompleteLabel.text = "ANTE %d  LEVEL %d\nCOMPLETE" % [ante, level_in_ante]
+	$LevelCompleteLabel.show()
 
 func _update_xp_bar() -> void:
 	var level_index := GameManager.ship_level - 1
