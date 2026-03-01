@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://wyj3wlktp26a"]
 
 [ext_resource type="Script" uid="uid://cckdg1srq2jv2" path="res://scripts/main/Main.gd" id="1_maingd"]
+[ext_resource type="Script" path="res://scripts/ui/DebugMenu.gd" id="12_debugmenu"]
 [ext_resource type="PackedScene" uid="uid://dokhrnxnwmoym" path="res://scenes/background/parallax.tscn" id="2_85g3d"]
 [ext_resource type="PackedScene" uid="uid://b8u30hr14yhr1" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://cv4sru8n6v3ud" path="res://scenes/enemies/Enemy.tscn" id="3_enemy"]
@@ -34,3 +35,6 @@ enemy_bullet_scene = ExtResource("8_ebullet")
 [node name="WeaponUpgradeUI" parent="." unique_id=167407262 instance=ExtResource("10_wupgrade")]
 
 [node name="PilotAcademy" parent="." unique_id=1187321609 instance=ExtResource("11_pacademy")]
+
+[node name="DebugMenu" type="CanvasLayer" parent="." unique_id=999888777]
+script = ExtResource("12_debugmenu")
