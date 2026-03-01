@@ -16,263 +16,205 @@ _(nothing)_
 ## ✅ DESIGN CONFLICTS — RESOLVED
 
 - [x] **Weapon slots: 2 → 4–6 simultaneous** — Player now has MAX_SLOTS=6, all fire independently via per-slot delta timers. `unlocked_slots` starts at 2, expandable.
-- [x] **Weapon tier progression: duplicate pickup → XP-driven** — Single global weapon XP bar in GameManager (filled by energy gems). Threshold → player-choice upgrade menu. Threshold grows ×1.10 per upgrade.
-- [x] **Weapon stats: hardcoded → data-driven** — `data/weapons.json` is source of truth. WeaponDB loads JSON, scales via formula `base × (1 + dmg_scale)^(tier-1)`. Update JSON from xlsx when ready.
-- [x] **LevelUpUI / card conflation** — Clarified: LevelUpUI = stat upgrades only. Pilots come from Pilot Academy (Phase C).
-- [x] **Weapon auto-tier → player-choice upgrade menu** — WeaponUpgradeUI pauses game and shows 3 options. Player picks → `upgrade_weapon_choice(slot)` applies tier-up.
-- [x] **Shop renamed → Pilot Academy** — Appears after every level (all 3), not just between levels.
-- [x] **Boss every level** — L1 & L2 end with Mini Boss; L3 ends with Big Boss. Placeholder bosses implemented (Phase F).
-- [x] **Currency: shop_energy → credits** — Energy gems fill weapon XP bar only. Credits are earned as a wage at end of each level (`50 + (ante-1)×15 + (level-1)×5`) and spent in Pilot Academy.
+- [x] **Weapon tier progression: duplicate pickup → XP-driven** — Single global weapon XP bar in GameManager. Threshold → player-choice upgrade menu. Threshold grows ×1.10 per upgrade.
+- [x] **Weapon stats: hardcoded → data-driven** — `data/weapons.json` runtime source. WeaponDB loads JSON, scales via `base × (1 + dmg_scale)^(tier-1)`. Master data in `data/game_data.xlsx`.
+- [x] **LevelUpUI / card conflation** — LevelUpUI = stat upgrades only. Pilots come from Pilot Academy.
+- [x] **Weapon auto-tier → player-choice upgrade menu** — WeaponUpgradeUI pauses game, 3 options, player picks.
+- [x] **Shop renamed → Pilot Academy** — Opens after every level (all 3 per ante).
+- [x] **Boss every level** — L1 & L2 end with Mini Boss; L3 ends with Big Boss. Placeholders done.
+- [x] **Currency: shop_energy → credits** — Gems fill weapon XP bar only. Credits = per-level wage.
+- [x] **Weapon types: 4** — ballistic / energy / missile / fire. Fire Specialist pilot planned.
+- [x] **Bullet visuals: future AnimatedSprite2D per weapon type** — Current ColorRect is placeholder. `bullet_scene` field to be added to game_data.xlsx when assets ready. No architectural changes needed.
 
 ---
 
-## ✅ PHASE A — Bounce Mechanic (Core Identity) — COMPLETE
+## ✅ PHASE A — Bounce Mechanic — COMPLETE
 
-> "Bounce is a base mechanic, not a pilot unlock." — DESIGN.md §10
-
-- [x] Bullets bounce off top and bottom viewport walls (reflect Y velocity)
-- [x] Bullets despawn on left wall exit (already works — off-screen check)
-- [x] `bounce_count` property on Bullet (starts at 1 by default)
-- [x] Bullet tracks how many times it has bounced (`bounces_done`)
+- [x] Bullets bounce off top/bottom walls (reflect Y velocity)
+- [x] `bounce_count` / `bounces_done` on Bullet
 - [x] Bullets despawn after exceeding bounce_count
-- [x] `EventBus.bullet_bounced(bullet, bounce_number)` emitted on each bounce
-- [x] `bounce_damage_multiplier` stub on Bullet — PilotManager populates this
-- [x] Bullet switched to `velocity: Vector2` (was scalar speed) — enables Y reflection
+- [x] `EventBus.bullet_bounced(bullet, bounce_number)` signal
+- [x] `bounce_damage_multiplier` stub — PilotManager populates this
+- [x] Bullet uses `velocity: Vector2` (enables Y reflection)
 
 ---
 
 ## ✅ PHASE B — Ante / Level Structure — COMPLETE
 
-- [x] `LevelManager` autoload — state machine: IDLE → PLAYING → CLEARING → BOSS_FIGHT → COMPLETE
-- [x] Finite waves: 20 waves/level (12s apart), EnemySpawner stops on `waves_exhausted`, restarts on `level_started`
-- [x] Level completion: `active_enemies` tracked via `enemy_spawned`/`enemy_died`; clears → boss fight → completes
-- [x] Ante progression: 3 levels per ante, `ante_completed` signal, ante counter increments
-- [x] Difficulty scaling: HP/speed multipliers per ante applied to each enemy on spawn
-- [x] HUD: Ante/Level label + "LEVEL COMPLETE" overlay
-- [x] Level cleanup: all transient nodes (enemies, gems, bullets, pickups) added to "level_objects" group → bulk-freed on `level_started`
-- [x] Debug skip: F5 in debug build skips to boss fight; F5 again skips boss → Pilot Academy
-- [x] Mini Boss placeholder after L1 & L2 (see Phase F)
-- [x] Big Boss placeholder after L3 (see Phase F)
+- [x] LevelManager state machine: IDLE → PLAYING → CLEARING → BOSS_FIGHT → COMPLETE
+- [x] 20 waves/level (12s apart), EnemySpawner stops on `waves_exhausted`
+- [x] BOSS_FIGHT: spawned after all waves + enemies cleared; boss death → Pilot Academy
+- [x] 3 levels per ante, ante_completed signal, difficulty scaling per ante
+- [x] HUD: Ante/Level label + "LEVEL COMPLETE" overlay + Boss HP bar (top centre)
+- [x] Level cleanup: "level_objects" group bulk-freed on `level_started`
+- [x] Debug: F5 skips to boss fight; F5 again skips boss → Pilot Academy
+- [x] Mini Boss placeholder (500 HP) after L1 & L2
+- [x] Big Boss placeholder (2000 HP) after L3
 
 ---
 
-## ✅ PHASE C — Pilot Academy Scene — COMPLETE
+## ✅ PHASE C — Pilot Academy — COMPLETE
 
-> "The Pilot Academy opens after every level." — DESIGN.md §2 (revised)
-
-- [x] `PilotAcademy.tscn` + `PilotAcademy.gd` — full-screen opaque dark navy screen after every level
-- [x] Replaces 3-second auto-advance placeholder in LevelManager (`await EventBus.pilot_academy_closed`)
-- [x] Shows 3 random pilot card offers (from PilotManager.get_available_pilots(), shuffled)
-- [x] Ship stat upgrades — 4 fixed rows: +20 HP / +30 Speed / +1 Weapon Slot / +10% Dmg Bonus
-- [x] "Continue →" / "Enter Level N →" / "Ante N Complete →" button resumes play
-- [x] Funded by credits (per-level wage, not energy gems)
-- [x] Active pilot roster shown at bottom of Academy screen
-- [x] Credits display in Academy header
-- [ ] Pilot swap — replace active pilot with Academy offer (deferred to Phase D)
-- [ ] Weapon merging — same type + same tier → next tier, costs credits (deferred to Phase D)
+- [x] Full-screen opaque academy screen after every level
+- [x] `await EventBus.pilot_academy_closed` replaces 3-second placeholder
+- [x] 3 random pilot card offers from PilotManager pool
+- [x] 4 ship stat upgrade rows (HP / Speed / Weapon Slot / Dmg Bonus)
+- [x] Credits display + continue button with contextual label
+- [x] Active pilot roster shown at bottom
+- [ ] Pilot swap — replace active pilot with offer (deferred to Phase D)
+- [ ] Weapon merging — same type + tier → next tier, costs credits (deferred to Phase D)
 
 ---
 
-## ✅ PHASE D (partial) — Pilot System — IN PROGRESS
+## 📋 PHASE D — Pilot System (Full)
 
-> Pilots are Joker-style passives. 6 real pilots implemented. Full 100+ pool is Phase D proper.
+> 6 pilots implemented. Full 100+ pool, combos, and damage chain UI still pending.
 
-### Data ✅
-- [x] `data/pilots.json` — 6 pilot definitions (power_surge, shield_tech, ballistic_expert, energy_specialist, ricochet_artist, afterburner)
-- [x] Pilot data structure: id, name, type, rarity, cost, desc, effect, value, optional weapon_category
-- [ ] Full pilot database from `Card_Database_Spreadsheet.xlsx` — 100+ pilots target
+### Data
+- [x] `data/pilots.json` — 6 pilots (power_surge, shield_tech, ballistic_expert, energy_specialist, ricochet_artist, afterburner)
+- [x] `data/game_data.xlsx` Pilots sheet — template ready, 6 existing + blank rows for 100+ target
+- [ ] Fill pilot pool in game_data.xlsx → import to pilots.json (user fills spreadsheet first)
 - [ ] Pilot rarity weights: Common 70% / Rare 25% / Epic 4.5% / Legendary 0.5%
-- [ ] Pilot unlock tracking (starts small, grows with meta-progression)
+- [ ] Fire Specialist pilot (weapon_type, fire category) — once fire weapon type implemented
+- [ ] Pilot unlock tracking (meta-progression)
 
-### Pilot Manager ✅
-- [x] `PilotManager` autoload — holds active roster (max 5), evaluates effects
-- [x] `apply_pilots(base_damage, weapon_type)` — flat % then type multipliers
-- [x] `get_bounce_multiplier()` — returns product of all bounce_mult pilots
-- [x] `add_pilot(pilot_data, player)` — appends to roster, applies one-time stat effects
-- [x] `reset()` — called on run start via GameManager.start_run()
-- [ ] Combo detection — check active roster against named combo triggers after every change
-- [ ] `apply_pilots` with full order of ops: Flat → Type × → Conditional × → Combo ×
+### Pilot Manager
+- [x] `PilotManager` autoload — roster (max 5), apply_pilots(), get_bounce_multiplier(), add_pilot(), reset()
+- [ ] Full order of ops: Flat → Type × → Conditional × → Combo ×
+- [ ] Combo detection after every roster change
 
-### Pilot Types (partial)
-- [x] Global pilots — power_surge (+20% dmg), shield_tech (+25 shield), afterburner (+40 speed)
-- [x] Weapon Type pilots — ballistic_expert (×1.5 ballistic), energy_specialist (×1.5 energy)
-- [x] Conditional pilots — ricochet_artist (×2 on bounced shots)
-- [ ] Combo pilots — named multi-pilot combinations (deferred)
+### Pilot Types
+- [x] Global — power_surge, shield_tech, afterburner
+- [x] Weapon Type — ballistic_expert, energy_specialist
+- [x] Conditional — ricochet_artist (bounce ×2)
+- [ ] Fire Specialist (weapon_type, fire)
+- [ ] Combo pilots
 
 ### UI
-- [x] Active pilot display in HUD (up to 5 slots, names shown)
-- [ ] **Damage chain UI** — show running multiplication per shot: `12 → ×2 (Ballistic) → ×3 (Bounce) = 72`
+- [x] Active pilot names shown in HUD
+- [ ] **Damage chain UI** — `12 → ×2 (Ballistic) → ×3 (Bounce) = 72` shown per shot
 
 ---
 
 ## ✅ PHASE E+ — Energy Gem Pickup — COMPLETE
 
-- [x] `scenes/pickups/EnergyGem.tscn` — pulsing diamond, drifts left, magnets to player at 250px range
-- [x] Gem carries `xp_value` + `source_weapon_slot` from the kill shot
-- [x] All 3 enemy types drop a gem on death (always), passing source_slot through take_damage → die
-- [x] Bounce multiplier applied in KamikazeDrone and TurretPlatform area_entered handlers
-- [x] `EventBus.energy_collected(amount, weapon_slot)` — fills global weapon XP bar in GameManager
-- [x] Global weapon XP bar in HUD (orange, labeled "XP N/N"), triggers upgrade menu when full
+- [x] EnergyGem.tscn — drifts left, magnets to player at 250px
+- [x] All enemies drop gems on death
+- [x] `EventBus.energy_collected` → fills global weapon XP bar
+- [x] Global XP bar in HUD (orange), triggers upgrade menu when full
 
 ---
 
-## ✅ PHASE E — Weapon System Rework — COMPLETE
+## ✅ PHASE E — Weapon System — COMPLETE
 
-- [x] `data/weapons.json` — weapon base stats + scale % (replace hardcoded WeaponDB)
-- [x] WeaponDB loads from JSON, formula-based tier scaling
-- [x] 6 weapon slots (MAX_SLOTS=6), all fire simultaneously on independent delta timers
-- [x] Global weapon XP bar — fills from energy gems, triggers `weapon_upgrade_available` when full, threshold ×1.10 per upgrade, resets between levels
-- [x] `WeaponUpgradeUI` — pauses game, shows 3 options, player picks → `upgrade_weapon_choice(slot)`
-- [x] `EventBus.weapon_upgrade_available` + `weapon_upgrade_chosen` signals added
-- [x] HUD: 6 weapon panels built dynamically, each with name label + tier badge
-- [x] Removed duplicate-pickup merge mechanic
-- [ ] Weapon tier-up visual feedback (flash/particle) — polish phase
+- [x] `data/weapons.json` + WeaponDB — formula-based tier scaling
+- [x] 6 slots (MAX_SLOTS=6), all fire simultaneously on independent timers
+- [x] Global XP bar → weapon_upgrade_available → WeaponUpgradeUI (3 options)
+- [x] HUD: 6 weapon panels with name + tier badge
+- [ ] Per-weapon bullet scene (AnimatedSprite2D) — when assets ready, add `bullet_scene` to game_data.xlsx + wire WeaponDB
 
 ### 📋 New Weapon Systems Required
-> Weapons designed in game_data.xlsx — implement systems below before those weapons can go live
+> Design complete in game_data.xlsx. Implement systems to unlock these weapons.
 
-- [ ] **DOT / Burn system** — on hit, apply burn timer to enemy; tick damage = hit_damage × burn_pct; affects: Energy Beam, Missile, Napalm, Nuke
-- [ ] **AOE explosion** — on bullet death, damage all enemies within radius; affects: Nuke, Cluster Bomb, Napalm
-- [ ] **Homing system** — bullet steers toward nearest enemy each frame; affects: Homing Missile
-- [ ] **Split / spawn children** — on trigger (impact/expiry/bounce), spawn N child bullets at spread angle; affects: Cluster Bomb, Nano Bots
-- [ ] **Fire weapon type** — 4th type alongside ballistic/energy/missile; Fire Specialist pilot needed; affects: Napalm
-
-### 📋 Weapons Designed (game_data.xlsx) — Pending Implementation
-- [ ] Heavy Machine Gun (ballistic — straightforward, no new systems)
-- [ ] Homing Missile (needs homing system)
-- [ ] Napalm (needs DOT + AOE + fire type)
-- [ ] Nuke (needs DOT + AOE)
-- [ ] Cluster Bomb (needs split system)
-- [ ] Nano Bots (needs split system — values incomplete in spreadsheet)
+- [ ] **Heavy Machine Gun** — no new systems, add to weapons.json now
+- [ ] **DOT / Burn** — on hit: apply burn timer, tick = hit_dmg × burn_pct; affects Energy Beam, Missile, Napalm, Nuke
+- [ ] **AOE explosion** — on bullet death: damage all enemies in radius; affects Nuke, Cluster Bomb, Napalm
+- [ ] **Homing** — bullet steers toward nearest enemy each frame; affects Homing Missile
+- [ ] **Split / spawn children** — on trigger: spawn N child bullets at spread angle; affects Cluster Bomb, Nano Bots
+- [ ] **Fire type** — 4th weapon type; Fire Specialist pilot; affects Napalm
+- [ ] Weapon tier-up visual feedback — polish phase
 
 ---
 
-## 📋 PHASE F — Boss Enemies (Placeholders Done, Full Implementation Pending)
+## 📋 PHASE F — Boss Enemies (Placeholders Done)
 
-> Required for every level: L1 & L2 end with Mini Boss; L3 ends with Big Boss.
+> L1 & L2 → Mini Boss. L3 → Big Boss.
 
-### ✅ Done
-- [x] `MiniBoss.gd` / `MiniBoss.tscn` — 500 HP, programmatic _draw() visuals (orange), slides in from right, up/down patrol, drops 6 gems
-- [x] `BigBoss.gd` / `BigBoss.tscn` — 2000 HP, programmatic _draw() visuals (purple), same entry pattern, drops 16 gems
-- [x] Boss HP bar in HUD — top-center, shows name + red bar on `boss_spawned`, hides on next level
-- [x] `EventBus.boss_spawned(boss_name, max_hp)` and `boss_hp_changed(current, maximum)` signals
-- [x] BOSS_FIGHT state in LevelManager — spawned after all waves + regular enemies cleared; boss death → Pilot Academy
-- [x] Difficulty scaling applied to boss HP and speed on spawn
+### ✅ Placeholders Done
+- [x] MiniBoss.gd / MiniBoss.tscn — 500 HP, _draw() visuals, patrol, drops 6 gems
+- [x] BigBoss.gd / BigBoss.tscn — 2000 HP, _draw() visuals, patrol, drops 16 gems
+- [x] Boss HP bar in HUD, boss signals in EventBus, difficulty scaling on spawn
 
-### 📋 Remaining (real boss designs)
-- [ ] Mini Boss real attack pattern (e.g. burst fire, charge)
-- [ ] Big Boss real attack pattern (multi-phase)
-- [ ] Small Boss variant 1 — Ante 1 L1 & L2 named design
+### 📋 Real Boss Designs
+- [ ] Mini Boss attack pattern (burst fire / charge)
+- [ ] Big Boss multi-phase attack pattern
 - [ ] Boss 1: Fortress Station (Ante 1 L3)
 - [ ] Boss 2: Battlecruiser (Ante 2 L3)
 - [ ] Boss 3: Mothership (Ante 3 L3)
+- [ ] 16× Mini Boss variants (L1 & L2 across 8 antes)
 - [ ] Boss intro / death animations
-- [ ] 16× Mini Boss variants (one per L1 & L2 across 8 antes)
 
 ---
 
 ## 📋 PHASE G — Ship Selection
 
-- [ ] Ship selection screen before run starts
-- [ ] Ship stats system: HP, speed, weapon slots, armour, weapon bonus (flat dmg addition)
-- [ ] Ship 1 — Interceptor (starter, always available)
-- [ ] Ship 2 — Tank (high HP, high armour, low speed) — meta unlock
-- [ ] Ship 3 — Glass Cannon (high weapon bonus, low HP) — meta unlock
-- [ ] Ship 4 — Scout (high speed, dodge-focused) — meta unlock
-- [ ] Ship 5 — Dreadnought (max weapon slots, slow) — meta unlock
-- [ ] Ships 6–8 — TBD — meta unlock
-- [ ] Ship weapon bonus feeds into damage formula (flat add before pilot multipliers)
+- [ ] Ship selection screen before run
+- [ ] Ship stats: HP, speed, weapon slots, armour, weapon bonus
+- [ ] Ship 1 — Interceptor (starter)
+- [ ] Ships 2–8 — meta unlocks (Tank, Glass Cannon, Scout, Dreadnought, TBD ×3)
+- [ ] Ship weapon bonus → damage formula (flat add before pilot multipliers)
 
 ---
 
-## 📋 PHASE H — Meta Progression (Pilot Academy Hub)
+## 📋 PHASE H — Meta Progression
 
-> "Not a priority until core gameplay loop is complete." — DESIGN.md §8
+> Not a priority until core loop is complete.
 
-- [ ] Pilot Academy hub scene (between runs)
-- [ ] XP persists between runs (save system — Godot ResourceSaver)
-- [ ] Ship unlock system (7 ships to unlock beyond Interceptor)
-- [ ] Weapon type unlock system
-- [ ] Pilot unlock system (100+ pilots unlocked progressively)
-- [ ] Permanent ship stat upgrades (small, not run-defining)
-- [ ] Unlock tracking persists to disk — save/load on Academy open
+- [ ] Pilot Academy hub (between runs)
+- [ ] Save system — XP, unlocks persist (Godot ResourceSaver)
+- [ ] Ship / weapon / pilot unlock systems
+- [ ] Permanent stat upgrades (minor)
 
 ---
 
 ## 📋 PHASE I — Polish
 
-- [ ] Visual effects — explosions, bullet trails, bounce flash
+- [ ] Visual effects — explosions, bullet trails, bounce flash, burn particles
+- [ ] Per-weapon AnimatedSprite2D bullets (coordinate with assets)
 - [ ] Audio — music, SFX per weapon type, SFX on pilot trigger
 - [ ] Main menu
 - [ ] Tutorial / onboarding
-- [ ] Balance pass — use Card Simulator sheet in weapons_prototype.xlsx
+- [ ] Balance pass — use Card Simulator sheet in game_data.xlsx
 - [ ] Achievement system
-- [ ] Weapon tier-up visual feedback (flash/particle)
 
 ---
 
 ## ✅ DONE
 
 ### Project Setup
-- [x] Project setup and folder structure
-- [x] GUT testing framework installed
-- [x] EventBus.gd (signal system)
-- [x] GameManager.gd (global state)
-- [x] Autoloads configured (EventBus, GameManager, WeaponDB, LevelManager, PilotManager)
+- [x] Project setup, GUT testing framework, EventBus, GameManager, WeaponDB, LevelManager, PilotManager autoloads
 
-### Phase 1 — Core Gameplay ✅ COMPLETE
-- [x] Ship movement (WASD + gamepad)
-- [x] Crosshair aiming (mouse + gamepad right stick)
-- [x] Firing mechanic toward crosshair with fire rate timer
-- [x] HP / Shield system with damage absorption
-- [x] Death signal + game over screen
-- [x] Screen boundary clamping
-- [x] Bullet scene + script (Bullet.tscn / Bullet.gd)
-- [x] Enemy 1 — Scout Fighter (wave movement)
-- [x] Enemy 2 — Kamikaze Drone (homing)
-- [x] Enemy 3 — Turret Platform (fires enemy bullets)
-- [x] Enemy spawner (wave patterns: flock / kamikaze rush / turret line)
-- [x] Enemy drops XP on death
-- [x] Bullet collision with enemies
-- [x] Enemy bullets damage player
-- [x] Player death → game over
+### Phase 1 — Core Gameplay ✅
+- [x] Ship movement (WASD + gamepad), crosshair aiming (mouse + gamepad)
+- [x] Firing toward crosshair, fire rate timer, HP/Shield system
+- [x] 3 enemy types, enemy spawner (3 wave patterns), XP drops
+- [x] Bullet collision, enemy bullets, player death → game over
 
-### Phase 2 — Progression ✅ COMPLETE
-- [x] XP drops from enemies, tracked in GameManager (run_xp, ship_xp)
-- [x] Ship levels up at XP thresholds
-- [x] LevelUpUI — pauses game, offers 3 stat upgrade choices (HP / Shield / Attack / Speed)
-- [x] apply_upgrade() on Player applies chosen stat
+### Phase 2 — Progression ✅
+- [x] XP tracking, ship level-up, LevelUpUI (3 stat choices), apply_upgrade()
 
-### Phase 3 — Weapons (partial — reworked as Phase E)
-- [x] WeaponDB autoload — 3 types (Ballistic/Energy/Missile), 5-tier scaling (data-driven from JSON)
-- [x] WeaponPickup.tscn — diamond pickup, drifts left, collected on player overlap
-- [x] 30% weapon drop on enemy death
-- [x] Bullet color + speed driven by active weapon
+### Phase 3 — Weapons (reworked as Phase E) ✅
+- [x] WeaponDB (3 types, data-driven), WeaponPickup, 30% drop rate
 
 ### Phase 7 — Polish (partial)
-- [x] Scrolling parallax background
-- [x] HP/Shield bars, score display, XP bar
-- [x] Game over screen with score + best score + restart
+- [x] Scrolling parallax background, HP/Shield/XP bars, game over screen
 
 ---
 
 ## 🐛 KNOWN BUGS / BLOCKERS
 - [ ] 2193 debug notices on startup — investigate source
-- [ ] Weapon slot switch (Shift) conflicts with design intent — remove once all slots fire simultaneously by default
+- [ ] Shift key weapon slot switch — remove once all slots fire simultaneously by default
 
 ---
 
-## 📝 NOTES & DECISIONS (from DESIGN.md §10)
-- Weapons tier up via global XP bar → player-choice upgrade menu (not duplicate collection)
-- **"Cards" are called Pilots** — Global / Type / Conditional — same mechanics, lore rename
-- Order of operations: Flat (incl. ship weapon bonus) → Type × → Conditional × → Combo ×
-- 4–6 simultaneous weapon slots (determined by ship's weapon slot stat)
-- Ante structure: 3 levels per ante, Pilot Academy between each, boss at end of every level
+## 📝 NOTES & DECISIONS
+- Weapons tier up via global XP bar → player-choice menu (not duplicate collection)
+- Pilots: Global / Type / Conditional / Combo — Joker-style passives only
+- Order of ops: Flat → Type × → Conditional × → Combo ×
+- 4 weapon types: ballistic / energy / missile / fire
 - Bounce is a base mechanic — not a pilot unlock
-- Bounce-conditional pilots are a design priority and unique game identity
-- Pilot UI must show damage chain visibly (Balatro-style running total)
-- Weapon, pilot, and ship data lives in spreadsheets — do not hardcode
-- Energy gems mid-run → fill weapon XP bar only (not credits)
-- Credits = per-level wage → spent in Pilot Academy on pilots and ship upgrades
-- Ships, weapons, and pilots all unlocked via Pilot Academy meta-progression
-- 8 ships total, 100+ pilots total
+- Damage chain UI (Balatro-style) is core dopamine loop — high priority in Phase D
+- All weapon, pilot, ship data in `data/game_data.xlsx` — never hardcode stats
+- `data/weapons.json` and `data/pilots.json` are runtime files generated from xlsx
+- Energy gems → weapon XP bar only. Credits = per-level wage → Pilot Academy spend
+- 8 ships, 100+ pilots, all unlocked via meta-progression
