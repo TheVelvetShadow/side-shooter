@@ -37,6 +37,9 @@ func get_weapon(type: String, tier: int) -> Dictionary:
 		"aoe_radius": float(base.get("aoe_radius", 0.0)),
 		"homing": bool(base.get("homing", false)),
 		"homing_strength": float(base.get("homing_strength", 2.5)),
+		"split_count": int(base.get("split_count", 0)),
+		"split_spread": float(base.get("split_spread", 45.0)),
+		"split_child_damage": int(base.get("split_child_damage", -1)),
 	}
 
 func random_weapon(max_tier: int = 1) -> Dictionary:
