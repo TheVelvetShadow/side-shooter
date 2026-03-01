@@ -128,6 +128,23 @@ _(nothing)_
 - [x] Removed duplicate-pickup merge mechanic
 - [ ] Weapon tier-up visual feedback (flash/particle) — polish phase
 
+### 📋 New Weapon Systems Required
+> Weapons designed in game_data.xlsx — implement systems below before those weapons can go live
+
+- [ ] **DOT / Burn system** — on hit, apply burn timer to enemy; tick damage = hit_damage × burn_pct; affects: Energy Beam, Missile, Napalm, Nuke
+- [ ] **AOE explosion** — on bullet death, damage all enemies within radius; affects: Nuke, Cluster Bomb, Napalm
+- [ ] **Homing system** — bullet steers toward nearest enemy each frame; affects: Homing Missile
+- [ ] **Split / spawn children** — on trigger (impact/expiry/bounce), spawn N child bullets at spread angle; affects: Cluster Bomb, Nano Bots
+- [ ] **Fire weapon type** — 4th type alongside ballistic/energy/missile; Fire Specialist pilot needed; affects: Napalm
+
+### 📋 Weapons Designed (game_data.xlsx) — Pending Implementation
+- [ ] Heavy Machine Gun (ballistic — straightforward, no new systems)
+- [ ] Homing Missile (needs homing system)
+- [ ] Napalm (needs DOT + AOE + fire type)
+- [ ] Nuke (needs DOT + AOE)
+- [ ] Cluster Bomb (needs split system)
+- [ ] Nano Bots (needs split system — values incomplete in spreadsheet)
+
 ---
 
 ## 📋 PHASE F — Boss Enemies (Placeholders Done, Full Implementation Pending)
