@@ -119,7 +119,7 @@ _(nothing)_
 - [x] **Heavy Machine Gun** — added to weapons.json (ballistic, dmg 14, rate 0.25, speed 700, silver)
 - [x] **DOT / Burn** — BurnComponent dynamically attached on hit; ticks hit_dmg × burn_pct every 0.5s; orange tint visual; Energy Beam (10%/1s) + Missile (2%/1s) live now
 - [x] **AOE explosion** — ExplosionEffect visual (expanding ring); damage falloff 100%→50% from centre to edge; burn applied to all AOE targets; Energy (80px), Missile (120px), Nuke (350px) live now
-- [ ] **Homing** — bullet steers toward nearest enemy each frame; affects Homing Missile
+- [x] **Homing** — bullet steers toward nearest enemy each frame; affects Homing Missile
 - [ ] **Split / spawn children** — on trigger: spawn N child bullets at spread angle; affects Cluster Bomb, Nano Bots
 - [ ] **Fire type** — 4th weapon type; Fire Specialist pilot; affects Napalm
 - [ ] Weapon tier-up visual feedback — polish phase

@@ -48,6 +48,21 @@
     "burn_duration": 5.0,
     "aoe_radius": 350.0
   },
+  "homing_missile": {
+    "name": "Homing Missile",
+    "base_damage": 30,
+    "base_fire_rate": 0.80,
+    "bullet_speed": 400.0,
+    "color": [1.0, 0.2, 0.0, 1.0],
+    "dmg_scale": 0.44,
+    "rate_scale": 0.16,
+    "xp_thresholds": [50, 150, 300, 500],
+    "burn_pct": 0.02,
+    "burn_duration": 1.0,
+    "aoe_radius": 80.0,
+    "homing": true,
+    "homing_strength": 2.5
+  },
   "heavy_machine_gun": {
     "name": "HMG",
     "base_damage": 14,

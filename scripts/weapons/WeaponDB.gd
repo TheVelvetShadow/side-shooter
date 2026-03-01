@@ -35,6 +35,8 @@ func get_weapon(type: String, tier: int) -> Dictionary:
 		"burn_pct": float(base.get("burn_pct", 0.0)),
 		"burn_duration": float(base.get("burn_duration", 0.0)),
 		"aoe_radius": float(base.get("aoe_radius", 0.0)),
+		"homing": bool(base.get("homing", false)),
+		"homing_strength": float(base.get("homing_strength", 2.5)),
 	}
 
 func random_weapon(max_tier: int = 1) -> Dictionary:

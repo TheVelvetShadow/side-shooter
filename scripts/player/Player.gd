@@ -66,6 +66,8 @@ func _fire_from_slot(slot: int) -> void:
 	bullet.burn_pct      = weapon.get("burn_pct", 0.0)
 	bullet.burn_duration = weapon.get("burn_duration", 0.0)
 	bullet.aoe_radius    = weapon.get("aoe_radius", 0.0)
+	bullet.homing        = weapon.get("homing", false)
+	bullet.homing_strength = weapon.get("homing_strength", 2.5)
 	bullet.speed = weapon["bullet_speed"]
 	bullet.bullet_color = weapon["color"]
 	bullet.weapon_slot = slot
