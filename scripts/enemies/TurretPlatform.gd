@@ -21,7 +21,6 @@ func _ready() -> void:
 	fire_timer.wait_time = fire_interval
 	fire_timer.timeout.connect(_on_fire_timer)
 	fire_timer.start()
-	area_entered.connect(_on_area_entered)
 	EventBus.enemy_spawned.emit(enemy_id)
 	call_deferred("_find_player")
 
@@ -68,11 +67,3 @@ func _try_drop_weapon() -> void:
 		pickup.global_position = global_position
 		get_tree().root.add_child(pickup)
 
-func _on_area_entered(area: Area2D) -> void:
-	if area is Bullet:
-		var b := area as Bullet
-		var dmg: int = b.damage
-		if b.bounces_done > 0:
-			dmg = int(dmg * b.bounce_damage_multiplier)
-		take_damage(dmg, b.weapon_slot)
-		area.queue_free()

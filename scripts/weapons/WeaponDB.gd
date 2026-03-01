@@ -32,6 +32,8 @@ func get_weapon(type: String, tier: int) -> Dictionary:
 		"bullet_speed": float(base["bullet_speed"]),
 		"color": Color(ca[0], ca[1], ca[2], ca[3]),
 		"xp_thresholds": base.get("xp_thresholds", [50, 150, 300, 500]),
+		"burn_pct": float(base.get("burn_pct", 0.0)),
+		"burn_duration": float(base.get("burn_duration", 0.0)),
 	}
 
 func random_weapon(max_tier: int = 1) -> Dictionary:

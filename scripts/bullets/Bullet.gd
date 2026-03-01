@@ -8,9 +8,10 @@ class_name Bullet
 
 var velocity: Vector2 = Vector2.ZERO
 var bounces_done: int = 0
-var weapon_slot: int = -1  # set by Player._fire_from_slot()
-# Stub: populated by PilotManager when conditional bounce pilots are active
+var weapon_slot: int = -1
 var bounce_damage_multiplier: float = 1.0
+var burn_pct: float = 0.0
+var burn_duration: float = 0.0
 
 func _ready() -> void:
 	$Visual.color = bullet_color
@@ -47,4 +48,6 @@ func _on_area_entered(area: Area2D) -> void:
 		if bounces_done > 0:
 			final_damage = int(damage * bounce_damage_multiplier)
 		area.take_damage(final_damage, weapon_slot)
+		if burn_pct > 0.0:
+			BurnComponent.apply_to(area, final_damage, burn_pct, burn_duration)
 		queue_free()

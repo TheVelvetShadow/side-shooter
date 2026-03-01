@@ -17,7 +17,9 @@
     "color": [0.2, 0.8, 1.0, 1.0],
     "dmg_scale": 0.44,
     "rate_scale": 0.16,
-    "xp_thresholds": [50, 150, 300, 500]
+    "xp_thresholds": [50, 150, 300, 500],
+    "burn_pct": 0.10,
+    "burn_duration": 1.0
   },
   "missile": {
     "name": "Missile",
@@ -27,7 +29,9 @@
     "color": [1.0, 0.35, 0.1, 1.0],
     "dmg_scale": 0.44,
     "rate_scale": 0.16,
-    "xp_thresholds": [50, 150, 300, 500]
+    "xp_thresholds": [50, 150, 300, 500],
+    "burn_pct": 0.02,
+    "burn_duration": 1.0
   },
   "heavy_machine_gun": {
     "name": "HMG",

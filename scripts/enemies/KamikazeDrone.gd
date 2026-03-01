@@ -16,7 +16,6 @@ var _player: Node2D = null
 func _ready() -> void:
 	current_hp = max_hp
 	body_entered.connect(_on_body_entered)
-	area_entered.connect(_on_area_entered)
 	add_to_group("level_objects")
 	EventBus.enemy_spawned.emit(enemy_id)
 	call_deferred("_find_player")
@@ -66,12 +65,3 @@ func _on_body_entered(body: Node2D) -> void:
 	if body is Player:
 		body.take_damage(contact_damage)
 		die()
-
-func _on_area_entered(area: Area2D) -> void:
-	if area is Bullet:
-		var b := area as Bullet
-		var dmg: int = b.damage
-		if b.bounces_done > 0:
-			dmg = int(dmg * b.bounce_damage_multiplier)
-		take_damage(dmg, b.weapon_slot)
-		area.queue_free()

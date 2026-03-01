@@ -117,7 +117,7 @@ _(nothing)_
 > Design complete in game_data.xlsx. Implement systems to unlock these weapons.
 
 - [x] **Heavy Machine Gun** — added to weapons.json (ballistic, dmg 14, rate 0.25, speed 700, silver)
-- [ ] **DOT / Burn** — on hit: apply burn timer, tick = hit_dmg × burn_pct; affects Energy Beam, Missile, Napalm, Nuke
+- [x] **DOT / Burn** — BurnComponent dynamically attached on hit; ticks hit_dmg × burn_pct every 0.5s; orange tint visual; Energy Beam (10%/1s) + Missile (2%/1s) live now
 - [ ] **AOE explosion** — on bullet death: damage all enemies in radius; affects Nuke, Cluster Bomb, Napalm
 - [ ] **Homing** — bullet steers toward nearest enemy each frame; affects Homing Missile
 - [ ] **Split / spawn children** — on trigger: spawn N child bullets at spread angle; affects Cluster Bomb, Nano Bots
@@ -204,6 +204,7 @@ _(nothing)_
 ## 🐛 KNOWN BUGS / BLOCKERS
 - [ ] 2193 debug notices on startup — investigate source
 - [ ] Shift key weapon slot switch — remove once all slots fire simultaneously by default
+- [x] Double-damage bug on KamikazeDrone + TurretPlatform — removed redundant area_entered bullet handlers; Bullet.gd is sole authority for bullet hit detection
 
 ---
 
