@@ -1,47 +1,44 @@
 extends Node
 
-const WEAPON_TYPES: Dictionary = {
-	"ballistic": {
-		"name": "Ballistic",
-		"base_damage": 10,
-		"base_fire_rate": 0.20,
-		"bullet_speed": 900.0,
-		"color": Color(1.0, 1.0, 0.2, 1.0),
-	},
-	"energy": {
-		"name": "Energy",
-		"base_damage": 18,
-		"base_fire_rate": 0.38,
-		"bullet_speed": 1100.0,
-		"color": Color(0.2, 0.8, 1.0, 1.0),
-	},
-	"missile": {
-		"name": "Missile",
-		"base_damage": 35,
-		"base_fire_rate": 0.75,
-		"bullet_speed": 500.0,
-		"color": Color(1.0, 0.35, 0.1, 1.0),
-	},
-}
+var _weapons: Dictionary = {}
 
-const TIER_DMG:  Array[float] = [1.0, 1.5, 2.2, 3.0, 4.0]
-const TIER_RATE: Array[float] = [1.0, 0.85, 0.72, 0.60, 0.50]
+func _ready() -> void:
+	var file := FileAccess.open("res://data/weapons.json", FileAccess.READ)
+	if file == null:
+		push_error("WeaponDB: cannot open res://data/weapons.json")
+		return
+	var json := JSON.new()
+	if json.parse(file.get_as_text()) != OK:
+		push_error("WeaponDB: JSON parse error — %s" % json.get_error_message())
+		return
+	_weapons = json.data
+	file.close()
 
 func get_weapon(type: String, tier: int) -> Dictionary:
-	var base = WEAPON_TYPES[type]
-	var t = clampi(tier - 1, 0, 4)
+	if not _weapons.has(type):
+		push_error("WeaponDB: unknown type '%s'" % type)
+		return {}
+	var base: Dictionary = _weapons[type]
+	var t := clampi(tier - 1, 0, 4)
+	var dmg_scale := float(base.get("dmg_scale", 0.44))
+	var rate_scale := float(base.get("rate_scale", 0.16))
+	var ca: Array = base.get("color", [1.0, 1.0, 1.0, 1.0])
 	return {
 		"type": type,
 		"tier": tier,
 		"name": "%s T%d" % [base["name"], tier],
-		"damage": int(base["base_damage"] * TIER_DMG[t]),
-		"fire_rate": base["base_fire_rate"] * TIER_RATE[t],
-		"bullet_speed": base["bullet_speed"],
-		"color": base["color"],
+		"damage": int(float(base["base_damage"]) * pow(1.0 + dmg_scale, t)),
+		"fire_rate": float(base["base_fire_rate"]) * pow(1.0 - rate_scale, t),
+		"bullet_speed": float(base["bullet_speed"]),
+		"color": Color(ca[0], ca[1], ca[2], ca[3]),
+		"xp_thresholds": base.get("xp_thresholds", [50, 150, 300, 500]),
 	}
 
 func random_weapon(max_tier: int = 1) -> Dictionary:
-	var types = WEAPON_TYPES.keys()
-	var type: String = types[randi() % types.size()]
-	var tier: int = randi_range(1, max_tier)
-	return get_weapon(type, tier)
+	var types := _weapons.keys()
+	if types.is_empty():
+		return {}
+	return get_weapon(types[randi() % types.size()], randi_range(1, max_tier))
+
+func get_all_types() -> Array:
+	return _weapons.keys()

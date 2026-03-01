@@ -1,107 +1,129 @@
 extends CharacterBody2D
 class_name Player
 
+const MAX_SLOTS: int = 6
+
 @export var max_hp: int = 100
 @export var max_shield: int = 50
 @export var attack_multiplier: float = 1.0
 @export var move_speed: float = 300.0
-@export var fire_rate: float = 0.25
 
 var current_hp: int
 var current_shield: int
-var can_fire: bool = true
 
-var weapon_slots: Array = [null, null]
-var active_slot: int = 0
+var unlocked_slots: int = 2
+var weapon_slots: Array = []    # size MAX_SLOTS, each null or weapon Dictionary
+var slot_timers: Array[float] = []  # seconds until next shot per slot
+var weapon_xp: Array[int] = []      # accumulated XP per slot
 
-@onready var fire_timer: Timer = $FireTimer
 @onready var bullet_spawn: Marker2D = $BulletSpawn
-
 @export var bullet_scene: PackedScene
 
 func _ready() -> void:
 	current_hp = max_hp
 	current_shield = max_shield
-	fire_timer.wait_time = fire_rate
-	fire_timer.one_shot = true
+	for i in MAX_SLOTS:
+		weapon_slots.append(null)
+		slot_timers.append(0.0)
+		weapon_xp.append(0)
 	add_to_group("player")
+	EventBus.weapon_xp_gained.connect(_on_weapon_xp_gained)
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	_handle_movement()
-	_handle_weapon_switch()
-	_handle_firing()
+	_handle_firing(delta)
 	move_and_slide()
 	clamp_to_screen()
 
 func _handle_movement() -> void:
-	var direction := Vector2.ZERO
-	direction.x = Input.get_axis("move_left", "move_right")
-	direction.y = Input.get_axis("move_up", "move_down")
-	if direction != Vector2.ZERO:
-		direction = direction.normalized()
-	velocity = direction * move_speed
+	var dir := Vector2(
+		Input.get_axis("move_left", "move_right"),
+		Input.get_axis("move_up", "move_down")
+	)
+	velocity = dir.normalized() * move_speed if dir != Vector2.ZERO else Vector2.ZERO
 
-func _handle_weapon_switch() -> void:
-	if Input.is_action_just_pressed("special"):
-		active_slot = 1 - active_slot
-		EventBus.weapon_slot_switched.emit(active_slot)
+func _handle_firing(delta: float) -> void:
+	if not Input.is_action_pressed("fire"):
+		return
+	for i in unlocked_slots:
+		if weapon_slots[i] == null:
+			continue
+		slot_timers[i] -= delta
+		if slot_timers[i] <= 0.0:
+			_fire_from_slot(i)
+			slot_timers[i] = weapon_slots[i]["fire_rate"]
 
-func _handle_firing() -> void:
-	if Input.is_action_pressed("fire") and can_fire:
-		fire()
-
-func fire() -> void:
+func _fire_from_slot(slot: int) -> void:
 	if not bullet_scene:
 		return
-	can_fire = false
+	var weapon: Dictionary = weapon_slots[slot]
 	var bullet = bullet_scene.instantiate()
-	var weapon = weapon_slots[active_slot]
-	if weapon:
-		bullet.damage = int(weapon["damage"] * attack_multiplier)
-		bullet.speed = weapon["bullet_speed"]
-		bullet.bullet_color = weapon["color"]
-		fire_timer.wait_time = weapon["fire_rate"]
-	else:
-		bullet.damage = int(10.0 * attack_multiplier)
-		fire_timer.wait_time = fire_rate
+	bullet.damage = int(weapon["damage"] * attack_multiplier)
+	bullet.speed = weapon["bullet_speed"]
+	bullet.bullet_color = weapon["color"]
+	bullet.weapon_slot = slot
 	bullet.global_position = bullet_spawn.global_position
 	get_tree().root.add_child(bullet)
-	# Aim toward crosshair (overrides the default horizontal velocity set in _ready)
 	var crosshairs := get_tree().get_nodes_in_group("crosshair")
 	if crosshairs.size() > 0:
 		var to_target: Vector2 = (crosshairs[0] as Node2D).global_position - bullet_spawn.global_position
 		if to_target.length() > 1.0:
 			bullet.velocity = to_target.normalized() * bullet.speed
 	EventBus.bullet_fired.emit({"position": bullet_spawn.global_position})
-	fire_timer.start()
-
-func _on_fire_timer_timeout() -> void:
-	can_fire = true
 
 func equip_weapon(weapon_data: Dictionary) -> void:
-	var type = weapon_data["type"]
-	var tier = weapon_data["tier"]
-	# Merge if same type + tier exists in a slot
-	for i in 2:
-		if weapon_slots[i] != null and weapon_slots[i]["type"] == type and weapon_slots[i]["tier"] == tier:
-			if tier < 5:
-				weapon_slots[i] = WeaponDB.get_weapon(type, tier + 1)
-				EventBus.weapon_merged.emit(type, tier + 1)
-				EventBus.weapon_equipped.emit(i, weapon_slots[i])
-			return
-	# Fill empty slot
-	for i in 2:
+	# Fill first empty unlocked slot
+	for i in unlocked_slots:
 		if weapon_slots[i] == null:
 			weapon_slots[i] = weapon_data
+			weapon_xp[i] = 0
+			slot_timers[i] = 0.0
 			EventBus.weapon_equipped.emit(i, weapon_data)
 			return
-	# Both full — replace active slot
-	weapon_slots[active_slot] = weapon_data
-	EventBus.weapon_equipped.emit(active_slot, weapon_data)
+	# All slots full — replace the lowest-tier weapon if new one is stronger
+	var weakest_slot := 0
+	var weakest_tier := weapon_slots[0]["tier"]
+	for i in range(1, unlocked_slots):
+		if weapon_slots[i]["tier"] < weakest_tier:
+			weakest_tier = weapon_slots[i]["tier"]
+			weakest_slot = i
+	if weapon_data["tier"] > weakest_tier:
+		weapon_slots[weakest_slot] = weapon_data
+		weapon_xp[weakest_slot] = 0
+		slot_timers[weakest_slot] = 0.0
+		EventBus.weapon_equipped.emit(weakest_slot, weapon_data)
+
+func _on_weapon_xp_gained(slot: int, amount: int) -> void:
+	if slot < 0 or slot >= unlocked_slots or weapon_slots[slot] == null:
+		return
+	weapon_xp[slot] += amount
+	var weapon: Dictionary = weapon_slots[slot]
+	var tier: int = weapon["tier"]
+	var thresholds: Array = weapon.get("xp_thresholds", [50, 150, 300, 500])
+	var max_xp: int = thresholds[tier - 1] if tier <= 4 else 1
+	EventBus.weapon_xp_updated.emit(slot, weapon_xp[slot], max_xp)
+	_check_tier_up(slot)
+
+func _check_tier_up(slot: int) -> void:
+	var weapon: Dictionary = weapon_slots[slot]
+	var tier: int = weapon["tier"]
+	if tier >= 5:
+		return
+	var thresholds: Array = weapon.get("xp_thresholds", [50, 150, 300, 500])
+	if weapon_xp[slot] >= thresholds[tier - 1]:
+		weapon_slots[slot] = WeaponDB.get_weapon(weapon["type"], tier + 1)
+		weapon_xp[slot] = 0
+		EventBus.weapon_equipped.emit(slot, weapon_slots[slot])
+		EventBus.weapon_tiered_up.emit(slot, weapon_slots[slot])
+
+func unlock_slot() -> void:
+	if unlocked_slots < MAX_SLOTS:
+		unlocked_slots += 1
+		EventBus.weapon_equipped.emit(unlocked_slots - 1, null)
 
 func take_damage(amount: int) -> void:
 	if current_shield > 0:
-		var shield_absorbed: int = mini(current_shield, amount)
+		var shield_absorbed := mini(current_shield, amount)
 		current_shield -= shield_absorbed
 		amount -= shield_absorbed
 		EventBus.player_shield_changed.emit(current_shield, max_shield)

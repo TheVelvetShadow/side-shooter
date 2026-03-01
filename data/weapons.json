@@ -1,0 +1,32 @@
+{
+  "ballistic": {
+    "name": "Ballistic",
+    "base_damage": 10,
+    "base_fire_rate": 0.20,
+    "bullet_speed": 900.0,
+    "color": [1.0, 1.0, 0.2, 1.0],
+    "dmg_scale": 0.44,
+    "rate_scale": 0.16,
+    "xp_thresholds": [50, 150, 300, 500]
+  },
+  "energy": {
+    "name": "Energy",
+    "base_damage": 18,
+    "base_fire_rate": 0.38,
+    "bullet_speed": 1100.0,
+    "color": [0.2, 0.8, 1.0, 1.0],
+    "dmg_scale": 0.44,
+    "rate_scale": 0.16,
+    "xp_thresholds": [50, 150, 300, 500]
+  },
+  "missile": {
+    "name": "Missile",
+    "base_damage": 35,
+    "base_fire_rate": 0.75,
+    "bullet_speed": 500.0,
+    "color": [1.0, 0.35, 0.1, 1.0],
+    "dmg_scale": 0.44,
+    "rate_scale": 0.16,
+    "xp_thresholds": [50, 150, 300, 500]
+  }
+}

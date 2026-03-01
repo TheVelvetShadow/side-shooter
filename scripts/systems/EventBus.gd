@@ -11,9 +11,10 @@ signal player_hp_changed(current: int, maximum: int)
 signal bullet_fired(bullet_data: Dictionary)
 signal bullet_bounced(bullet: Bullet, bounce_number: int)
 signal weapon_picked_up(weapon_id: String)
-signal weapon_merged(weapon_id: String, new_tier: int)
 signal weapon_equipped(slot: int, weapon_data: Dictionary)
-signal weapon_slot_switched(active_slot: int)
+signal weapon_tiered_up(slot: int, weapon_data: Dictionary)
+signal weapon_xp_gained(slot: int, amount: int)
+signal weapon_xp_updated(slot: int, current_xp: int, max_xp: int)
 
 # Enemy signals
 signal enemy_died(enemy_id: String, xp_value: int)

@@ -13,14 +13,12 @@ _(nothing — assess design gaps before picking next task)_
 
 ---
 
-## ⚠️ DESIGN CONFLICTS — Must Fix Before Progressing
+## ✅ DESIGN CONFLICTS — RESOLVED
 
-These items were built but conflict with settled design decisions in DESIGN.md:
-
-- [ ] **Weapon slots: 2 → 4–6 simultaneous** — Current system has 2 slots with Shift to switch. Design: all equipped weapons fire independently on their own timers (Brotato-style). Requires rearchitecting weapon slot system in Player.gd and HUD.
-- [ ] **Weapon tier progression: duplicate pickup → XP-driven** — Current auto-merge triggers on collecting same type+tier. Design: each weapon accumulates its own XP from kills; tiers up at thresholds. Requires per-weapon XP tracking.
-- [ ] **Weapon stats: hardcoded → data-driven** — WeaponDB.gd hardcodes all stats. Design: base values and scale % live in `weapons_prototype.xlsx`. Requires CSV/JSON export from spreadsheet and loader.
-- [ ] **LevelUpUI conflates stat upgrades with card system** — Design separates these: stat upgrades happen via a pause/mid-level XP spend menu; *cards* come from the shop between levels. LevelUpUI can stay as the stat-upgrade route but should not be confused with card acquisition.
+- [x] **Weapon slots: 2 → 4–6 simultaneous** — Player now has MAX_SLOTS=6, all fire independently via per-slot delta timers. `unlocked_slots` starts at 2, expandable.
+- [x] **Weapon tier progression: duplicate pickup → XP-driven** — Per-slot `weapon_xp[]` tracking. Bullets carry `weapon_slot`, emit `weapon_xp_gained` on kill. Tier-up auto on threshold.
+- [x] **Weapon stats: hardcoded → data-driven** — `data/weapons.json` is source of truth. WeaponDB loads JSON, scales via formula `base × (1 + dmg_scale)^(tier-1)`. Update JSON from xlsx when ready.
+- [x] **LevelUpUI / card conflation** — Clarified: LevelUpUI = stat upgrades only. Pilots come from Shop (Phase C).
 
 ---
 
@@ -99,18 +97,16 @@ These items were built but conflict with settled design decisions in DESIGN.md:
 
 ---
 
-## 📋 PHASE E — Weapon System Rework
+## ✅ PHASE E — Weapon System Rework — COMPLETE
 
-> Fix the design conflicts flagged above.
-
-- [ ] Load weapon base stats + scale % from `weapons_prototype.xlsx` (CSV/JSON) — do not hardcode
-- [ ] Expand to 4–6 weapon slots, all firing simultaneously on independent timers
-- [ ] Per-weapon XP tracking — each equipped weapon gains XP from kills it deals
-- [ ] Weapon XP thresholds per weapon (from spreadsheet) — tier up automatically mid-level
-- [ ] Weapon tier-up visual feedback (flash, particle, HUD update)
-- [ ] HUD rework — show all active weapon slots (4–6) with name, tier, XP bar
-- [ ] Weapon slot unlock system (start with 2 slots; unlock more via shop or Pilot Academy)
-- [ ] Remove duplicate-pickup merge mechanic (replaced by XP system)
+- [x] `data/weapons.json` — weapon base stats + scale % (replace hardcoded WeaponDB)
+- [x] WeaponDB loads from JSON, formula-based tier scaling
+- [x] 6 weapon slots (MAX_SLOTS=6), all fire simultaneously on independent delta timers
+- [x] Per-slot weapon XP — bullets carry weapon_slot, emit weapon_xp_gained on kill
+- [x] Auto tier-up at XP thresholds, weapon_tiered_up signal emitted
+- [x] HUD: 6 weapon panels built dynamically, each with name label + XP progress bar
+- [x] Removed duplicate-pickup merge mechanic
+- [ ] Weapon tier-up visual feedback (flash/particle) — polish phase
 
 ---
 

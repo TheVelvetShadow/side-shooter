@@ -8,6 +8,7 @@ class_name Bullet
 
 var velocity: Vector2 = Vector2.ZERO
 var bounces_done: int = 0
+var weapon_slot: int = -1  # set by Player._fire_from_slot()
 # Stub: populated by PilotManager when conditional bounce pilots are active
 var bounce_damage_multiplier: float = 1.0
 
@@ -45,4 +46,5 @@ func _on_area_entered(area: Area2D) -> void:
 		if bounces_done > 0:
 			final_damage = int(damage * bounce_damage_multiplier)
 		area.take_damage(final_damage)
+		EventBus.weapon_xp_gained.emit(weapon_slot, (area as Enemy).xp_value)
 		queue_free()
