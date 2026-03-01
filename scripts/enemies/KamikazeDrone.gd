@@ -17,6 +17,7 @@ func _ready() -> void:
 	current_hp = max_hp
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
+	add_to_group("level_objects")
 	EventBus.enemy_spawned.emit(enemy_id)
 	call_deferred("_find_player")
 

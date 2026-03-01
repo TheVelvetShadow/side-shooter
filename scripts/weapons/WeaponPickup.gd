@@ -10,6 +10,7 @@ func _ready() -> void:
 	_weapon_data = WeaponDB.get_weapon(weapon_type, tier)
 	$Visual.color = _weapon_data["color"]
 	body_entered.connect(_on_body_entered)
+	add_to_group("level_objects")
 
 func _process(delta: float) -> void:
 	position.x -= drift_speed * delta

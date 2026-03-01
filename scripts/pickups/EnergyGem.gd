@@ -14,6 +14,7 @@ var _player: Node2D = null
 var _lifetime: float = 0.0
 
 func _ready() -> void:
+	add_to_group("level_objects")
 	var players := get_tree().get_nodes_in_group("player")
 	if players.size() > 0:
 		_player = players[0]

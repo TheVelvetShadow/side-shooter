@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://d3eol30jucpcb"]
+
+[ext_resource type="Script" path="res://scripts/enemies/MiniBoss.gd" id="1_miniboss"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_001"]
+radius = 44.0
+
+[node name="MiniBoss" type="Area2D"]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_miniboss")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_001")

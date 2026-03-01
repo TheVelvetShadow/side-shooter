@@ -60,7 +60,9 @@ func _fire_from_slot(slot: int) -> void:
 		return
 	var weapon: Dictionary = weapon_slots[slot]
 	var bullet = bullet_scene.instantiate()
-	bullet.damage = int(weapon["damage"] * attack_multiplier)
+	var base_damage := int(weapon["damage"] * attack_multiplier)
+	bullet.damage = PilotManager.apply_pilots(base_damage, weapon.get("type", ""))
+	bullet.bounce_damage_multiplier = PilotManager.get_bounce_multiplier()
 	bullet.speed = weapon["bullet_speed"]
 	bullet.bullet_color = weapon["color"]
 	bullet.weapon_slot = slot
@@ -96,24 +98,10 @@ func equip_weapon(weapon_data: Dictionary) -> void:
 		EventBus.weapon_equipped.emit(weakest_slot, weapon_data)
 
 func _on_energy_collected(amount: int, slot: int) -> void:
+	# Track per-slot XP for future weapon merging; upgrade trigger is handled by GameManager
 	if slot < 0 or slot >= unlocked_slots or weapon_slots[slot] == null:
 		return
 	weapon_xp[slot] += amount
-	var weapon: Dictionary = weapon_slots[slot]
-	var tier: int = weapon["tier"]
-	var thresholds: Array = weapon.get("xp_thresholds", [50, 150, 300, 500])
-	var max_xp: int = thresholds[tier - 1] if tier <= 4 else 1
-	EventBus.weapon_xp_updated.emit(slot, weapon_xp[slot], max_xp)
-	_check_tier_up(slot)
-
-func _check_tier_up(slot: int) -> void:
-	var weapon: Dictionary = weapon_slots[slot]
-	var tier: int = weapon["tier"]
-	if tier >= 5:
-		return
-	var thresholds: Array = weapon.get("xp_thresholds", [50, 150, 300, 500])
-	if weapon_xp[slot] >= thresholds[tier - 1]:
-		EventBus.weapon_upgrade_available.emit(slot)
 
 func upgrade_weapon_choice(slot: int) -> void:
 	var weapon: Dictionary = weapon_slots[slot]

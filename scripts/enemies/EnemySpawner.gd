@@ -7,7 +7,7 @@ class_name EnemySpawner
 @export var enemy_bullet_scene: PackedScene
 @export var flock_size: int = 5
 @export var flock_spread: float = 120.0
-@export var time_between_waves: float = 6.0
+@export var time_between_waves: float = 12.0
 
 @onready var wave_timer: Timer = $WaveTimer
 

@@ -47,6 +47,7 @@ EventBus="*uid://dbd1co8e5wu6m"
 GameManager="*uid://rk6wbj42n13h"
 WeaponDB="*res://scripts/weapons/WeaponDB.gd"
 LevelManager="*res://scripts/systems/LevelManager.gd"
+PilotManager="*res://scripts/systems/PilotManager.gd"
 
 [display]
 

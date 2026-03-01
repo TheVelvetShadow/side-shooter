@@ -1,9 +1,12 @@
 extends Node
 
-enum State { IDLE, PLAYING, CLEARING, COMPLETE }
+enum State { IDLE, PLAYING, CLEARING, BOSS_FIGHT, COMPLETE }
 
-const WAVES_PER_LEVEL: int = 4
+const WAVES_PER_LEVEL: int = 20
 const LEVELS_PER_ANTE: int = 3
+
+const MINI_BOSS_SCENE = preload("res://scenes/enemies/MiniBoss.tscn")
+const BIG_BOSS_SCENE  = preload("res://scenes/enemies/BigBoss.tscn")
 
 # Difficulty multipliers indexed by ante (0 = ante 1)
 const HP_MULT:    Array[float] = [1.0, 1.5, 2.5]
@@ -39,21 +42,47 @@ func _on_wave_spawned(wave_index: int) -> void:
 		state = State.CLEARING
 		EventBus.waves_exhausted.emit()
 		if active_enemies <= 0:
-			_complete_level()
+			_start_boss_fight()
 
 func _on_enemy_died(_id: String, _xp: int) -> void:
 	active_enemies = maxi(active_enemies - 1, 0)
 	if state == State.CLEARING and active_enemies <= 0:
+		_start_boss_fight()
+	elif state == State.BOSS_FIGHT and active_enemies <= 0:
 		_complete_level()
+
+func _start_boss_fight() -> void:
+	state = State.BOSS_FIGHT
+	active_enemies = 0  # reset so boss death triggers _complete_level
+	var boss_scene: PackedScene = MINI_BOSS_SCENE if level_in_ante < LEVELS_PER_ANTE else BIG_BOSS_SCENE
+	var boss := boss_scene.instantiate()
+	var vp := get_viewport().get_visible_rect()
+	boss.global_position = Vector2(vp.size.x + 100.0, vp.size.y * 0.5)
+	var diff := get_difficulty()
+	if "max_hp" in boss:
+		boss.max_hp = int(boss.max_hp * diff["hp_mult"])
+	if "speed" in boss:
+		boss.speed = boss.speed * diff["speed_mult"]
+	get_tree().root.add_child(boss)
 
 func _complete_level() -> void:
 	if state == State.COMPLETE:
 		return
 	state = State.COMPLETE
+	GameManager.award_level_wage(ante, level_in_ante)
 	EventBus.level_completed.emit(ante, level_in_ante)
-	# Phase C will replace this delay with the Shop scene
-	await get_tree().create_timer(3.0).timeout
+	await EventBus.pilot_academy_closed
 	_advance()
+
+func debug_skip_level() -> void:
+	match state:
+		State.PLAYING, State.CLEARING:
+			active_enemies = 0
+			state = State.CLEARING
+			_start_boss_fight()
+		State.BOSS_FIGHT:
+			active_enemies = 0
+			_complete_level()
 
 func _advance() -> void:
 	level_in_ante += 1

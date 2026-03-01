@@ -16,6 +16,7 @@ func _ready() -> void:
 	$Visual.color = bullet_color
 	velocity = Vector2(speed, 0.0)
 	area_entered.connect(_on_area_entered)
+	add_to_group("level_objects")
 
 func _process(delta: float) -> void:
 	position += velocity * delta
@@ -41,7 +42,7 @@ func _on_wall_hit() -> void:
 	EventBus.bullet_bounced.emit(self, bounces_done)
 
 func _on_area_entered(area: Area2D) -> void:
-	if area is Enemy:
+	if area.has_method("take_damage"):
 		var final_damage := damage
 		if bounces_done > 0:
 			final_damage = int(damage * bounce_damage_multiplier)

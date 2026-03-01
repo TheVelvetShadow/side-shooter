@@ -1,0 +1,64 @@
+{
+	"power_surge": {
+		"id": "power_surge",
+		"name": "Power Surge",
+		"type": "global",
+		"rarity": "common",
+		"cost": 20,
+		"desc": "+20% all bullet damage",
+		"effect": "damage_flat_pct",
+		"value": 0.20
+	},
+	"shield_tech": {
+		"id": "shield_tech",
+		"name": "Shield Tech",
+		"type": "global",
+		"rarity": "common",
+		"cost": 20,
+		"desc": "+25 Max Shield",
+		"effect": "shield_boost",
+		"value": 25
+	},
+	"ballistic_expert": {
+		"id": "ballistic_expert",
+		"name": "Ballistic Expert",
+		"type": "weapon_type",
+		"rarity": "rare",
+		"cost": 40,
+		"desc": "×1.5 Ballistic damage",
+		"effect": "weapon_type_mult",
+		"value": 1.5,
+		"weapon_category": "ballistic"
+	},
+	"energy_specialist": {
+		"id": "energy_specialist",
+		"name": "Energy Specialist",
+		"type": "weapon_type",
+		"rarity": "rare",
+		"cost": 40,
+		"desc": "×1.5 Energy damage",
+		"effect": "weapon_type_mult",
+		"value": 1.5,
+		"weapon_category": "energy"
+	},
+	"ricochet_artist": {
+		"id": "ricochet_artist",
+		"name": "Ricochet Artist",
+		"type": "conditional",
+		"rarity": "epic",
+		"cost": 60,
+		"desc": "×2 damage on bounced shots",
+		"effect": "bounce_mult",
+		"value": 2.0
+	},
+	"afterburner": {
+		"id": "afterburner",
+		"name": "Afterburner",
+		"type": "global",
+		"rarity": "rare",
+		"cost": 40,
+		"desc": "+40 Move Speed",
+		"effect": "speed_boost",
+		"value": 40.0
+	}
+}

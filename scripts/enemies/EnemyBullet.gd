@@ -7,6 +7,7 @@ var direction: Vector2 = Vector2.LEFT
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
+	add_to_group("level_objects")
 
 func _process(delta: float) -> void:
 	position += direction * speed * delta

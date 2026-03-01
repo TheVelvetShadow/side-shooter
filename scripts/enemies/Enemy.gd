@@ -21,6 +21,7 @@ func _ready() -> void:
 	current_hp = max_hp
 	_start_y = global_position.y
 	body_entered.connect(_on_body_entered)
+	add_to_group("level_objects")
 	EventBus.enemy_spawned.emit(enemy_id)
 
 func _process(delta: float) -> void:

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://c70obb272ujq4"]
+
+[ext_resource type="Script" path="res://scripts/ui/PilotAcademy.gd" id="1_pacademy"]
+
+[node name="PilotAcademy" type="CanvasLayer"]
+layer = 10
+process_mode = 3
+script = ExtResource("1_pacademy")
+
+[node name="DimBG" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.85)
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -450.0
+offset_top = -310.0
+offset_right = 450.0
+offset_bottom = 310.0

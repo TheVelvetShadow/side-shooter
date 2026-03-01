@@ -15,15 +15,22 @@ signal weapon_equipped(slot: int, weapon_data: Dictionary)
 signal weapon_tiered_up(slot: int, weapon_data: Dictionary)
 signal weapon_xp_updated(slot: int, current_xp: int, max_xp: int)
 signal weapon_upgrade_available(slot: int)
+signal weapon_xp_bar_updated(current: int, maximum: int)
 signal weapon_upgrade_chosen(slot: int)
 
 # Enemy signals
 signal enemy_died(enemy_id: String, xp_value: int)
 signal enemy_spawned(enemy_id: String)
 
+# Boss signals
+signal boss_spawned(boss_name: String, max_hp: int)
+signal boss_hp_changed(current: int, maximum: int)
+
 # Energy / pickup signals
 signal energy_collected(amount: int, weapon_slot: int)
-signal energy_changed(total: int)
+
+# Credits (pilot hiring wage)
+signal credits_changed(total: int)
 
 # XP / progression signals
 signal xp_gained(amount: int)
@@ -39,3 +46,4 @@ signal wave_spawned(wave_index: int)
 signal waves_exhausted()
 signal game_over()
 signal run_completed()
+signal pilot_academy_closed

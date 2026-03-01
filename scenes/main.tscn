@@ -9,8 +9,9 @@
 [ext_resource type="PackedScene" uid="uid://btlif2yiexto7" path="res://scenes/enemies/KamikazeDrone.tscn" id="6_kamikaze"]
 [ext_resource type="PackedScene" uid="uid://ca4f2w2lggcls" path="res://scenes/enemies/TurretPlatform.tscn" id="7_turret"]
 [ext_resource type="PackedScene" uid="uid://ci4vvpn0w5q7y" path="res://scenes/enemies/EnemyBullet.tscn" id="8_ebullet"]
-[ext_resource type="PackedScene" uid="uid://levelup001tscn" path="res://scenes/ui/LevelUpUI.tscn" id="9_levelup"]
-[ext_resource type="PackedScene" uid="uid://weaponupgrade001tscn" path="res://scenes/ui/WeaponUpgradeUI.tscn" id="10_wupgrade"]
+[ext_resource type="PackedScene" uid="uid://dys6m8uk87vth" path="res://scenes/ui/LevelUpUI.tscn" id="9_levelup"]
+[ext_resource type="PackedScene" path="res://scenes/ui/WeaponUpgradeUI.tscn" id="10_wupgrade"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PilotAcademy.tscn" id="11_pacademy"]
 
 [node name="Main" type="Node" unique_id=641290497]
 script = ExtResource("1_maingd")
@@ -28,6 +29,8 @@ enemy_bullet_scene = ExtResource("8_ebullet")
 
 [node name="HUD" parent="." unique_id=757137638 instance=ExtResource("5_hud")]
 
-[node name="LevelUpUI" parent="." instance=ExtResource("9_levelup")]
+[node name="LevelUpUI" parent="." unique_id=815588039 instance=ExtResource("9_levelup")]
 
-[node name="WeaponUpgradeUI" parent="." instance=ExtResource("10_wupgrade")]
+[node name="WeaponUpgradeUI" parent="." unique_id=167407262 instance=ExtResource("10_wupgrade")]
+
+[node name="PilotAcademy" parent="." unique_id=1187321609 instance=ExtResource("11_pacademy")]
