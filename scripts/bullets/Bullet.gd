@@ -43,16 +43,19 @@ func _home(delta: float) -> void:
 	velocity = velocity.lerp(desired, homing_strength * delta)
 	velocity = velocity.normalized() * speed   # keep speed constant
 
-func _find_nearest_enemy() -> Node:
-	var nearest: Node = null
+func _find_nearest_enemy() -> Node2D:
+	var nearest: Node2D = null
 	var nearest_dist := INF
 	for node in get_tree().get_nodes_in_group("level_objects"):
 		if not node.has_method("take_damage"):
 			continue
-		var dist := global_position.distance_to(node.global_position)
+		var n2d := node as Node2D
+		if n2d == null:
+			continue
+		var dist := global_position.distance_to(n2d.global_position)
 		if dist < nearest_dist:
 			nearest_dist = dist
-			nearest = node
+			nearest = n2d
 	return nearest
 
 func _check_wall_bounce() -> void:
@@ -114,7 +117,10 @@ func _aoe_explode(dmg: int, direct_hit: Node) -> void:
 			continue
 		if not node.has_method("take_damage"):
 			continue
-		var dist := node.global_position.distance_to(global_position)
+		var n2d := node as Node2D
+		if n2d == null:
+			continue
+		var dist := n2d.global_position.distance_to(global_position)
 		if dist <= aoe_radius:
 			var falloff := lerpf(1.0, 0.5, dist / aoe_radius)
 			var aoe_dmg := int(dmg * falloff)
