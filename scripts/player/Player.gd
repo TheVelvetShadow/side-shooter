@@ -61,7 +61,7 @@ func _fire_from_slot(slot: int) -> void:
 	var weapon: Dictionary = weapon_slots[slot]
 	var bullet = bullet_scene.instantiate()
 	var base_damage := int(weapon["damage"] * attack_multiplier)
-	bullet.damage = PilotManager.apply_pilots(base_damage, weapon.get("type", ""))
+	bullet.damage = PilotManager.apply_pilots(base_damage, weapon.get("category", weapon.get("type", "")))
 	bullet.bounce_damage_multiplier = PilotManager.get_bounce_multiplier()
 	bullet.burn_pct      = weapon.get("burn_pct", 0.0)
 	bullet.burn_duration = weapon.get("burn_duration", 0.0)

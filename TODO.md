@@ -121,7 +121,7 @@ _(nothing)_
 - [x] **AOE explosion** — ExplosionEffect visual (expanding ring); damage falloff 100%→50% from centre to edge; burn applied to all AOE targets; Energy (80px), Missile (120px), Nuke (350px) live now
 - [x] **Homing** — bullet steers toward nearest enemy each frame; affects Homing Missile
 - [x] **Split / spawn children** — on trigger: spawn N child bullets at spread angle; affects Cluster Bomb, Nano Bots
-- [ ] **Fire type** — 4th weapon type; Fire Specialist pilot; affects Napalm
+- [x] **Fire type** — 4th weapon type; Napalm weapon live; Fire Specialist pilot deferred to Phase D
 - [ ] Weapon tier-up visual feedback — polish phase
 
 ---

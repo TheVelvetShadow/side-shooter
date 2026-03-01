@@ -25,6 +25,7 @@ func get_weapon(type: String, tier: int) -> Dictionary:
 	var ca: Array = base.get("color", [1.0, 1.0, 1.0, 1.0])
 	return {
 		"type": type,
+		"category": base.get("category", type),
 		"tier": tier,
 		"name": "%s T%d" % [base["name"], tier],
 		"damage": int(float(base["base_damage"]) * pow(1.0 + dmg_scale, t)),
