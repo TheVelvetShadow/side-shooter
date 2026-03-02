@@ -10,6 +10,7 @@ var velocity: Vector2 = Vector2.ZERO
 var bounces_done: int = 0
 var weapon_slot: int = -1
 var bounce_damage_multiplier: float = 1.0
+var damage_chain: Array = []  # pilot chain steps set at fire time; bounce steps appended at hit
 var burn_pct: float = 0.0
 var burn_duration: float = 0.0
 var aoe_radius: float = 0.0
@@ -78,8 +79,13 @@ func _on_wall_hit() -> void:
 func _on_area_entered(area: Area2D) -> void:
 	if area.has_method("take_damage"):
 		var final_damage := damage
+		var chain := damage_chain.duplicate()
 		if bounces_done > 0:
 			final_damage = int(damage * bounce_damage_multiplier)
+			var bounce_steps := PilotManager.get_bounce_chain_steps(damage)
+			chain.append_array(bounce_steps)
+		if chain.size() > 1:
+			EventBus.damage_chain_shown.emit(chain)
 		area.take_damage(final_damage, weapon_slot)
 		if burn_pct > 0.0:
 			BurnComponent.apply_to(area, final_damage, burn_pct, burn_duration)

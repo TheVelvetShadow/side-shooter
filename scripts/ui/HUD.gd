@@ -19,6 +19,12 @@ var _boss_bar_container: Control
 var _boss_bar: ProgressBar
 var _boss_name_label: Label
 
+var _chain_label: Label
+var _chain_bg: Panel
+var _chain_timer: float = 0.0
+const CHAIN_DISPLAY_DURATION := 2.0
+const CHAIN_THROTTLE := 1.5  # don't replace a chain that's still fresh
+
 func _ready() -> void:
 	_build_dashboard()
 	_build_boss_bar()
@@ -32,6 +38,8 @@ func _ready() -> void:
 	EventBus.pilot_academy_closed.connect(_refresh_pilots)
 	EventBus.boss_spawned.connect(_on_boss_spawned)
 	EventBus.boss_hp_changed.connect(_on_boss_hp_changed)
+	EventBus.damage_chain_shown.connect(_on_damage_chain_shown)
+	_build_chain_display()
 
 func _build_dashboard() -> void:
 	# Full-width panel pinned to the bottom of the screen
@@ -260,6 +268,65 @@ func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
 func _on_boss_hp_changed(current: int, maximum: int) -> void:
 	_boss_bar.max_value = maximum
 	_boss_bar.value = current
+
+func _process(delta: float) -> void:
+	if _chain_timer > 0.0:
+		_chain_timer -= delta
+		var alpha := clampf(_chain_timer / CHAIN_DISPLAY_DURATION, 0.0, 1.0)
+		_chain_bg.modulate.a = alpha
+		if _chain_timer <= 0.0:
+			_chain_bg.hide()
+
+func _build_chain_display() -> void:
+	# Semi-transparent panel, top-right of screen
+	_chain_bg = Panel.new()
+	_chain_bg.anchor_left   = 1.0
+	_chain_bg.anchor_right  = 1.0
+	_chain_bg.anchor_top    = 0.0
+	_chain_bg.anchor_bottom = 0.0
+	_chain_bg.offset_left   = -520.0
+	_chain_bg.offset_right  = -8.0
+	_chain_bg.offset_top    = 8.0
+	_chain_bg.offset_bottom = 42.0
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.0, 0.0, 0.0, 0.65)
+	style.set_corner_radius_all(4)
+	_chain_bg.add_theme_stylebox_override("panel", style)
+
+	_chain_label = Label.new()
+	_chain_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_chain_label.add_theme_constant_override("margin_left", 10)
+	_chain_label.add_theme_constant_override("margin_right", 10)
+	_chain_label.add_theme_font_size_override("font_size", 14)
+	_chain_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_chain_label.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
+	_chain_label.modulate = Color(1.0, 0.95, 0.6, 1.0)
+	_chain_bg.add_child(_chain_label)
+	add_child(_chain_bg)
+	_chain_bg.hide()
+
+func _on_damage_chain_shown(steps: Array) -> void:
+	# Throttle: don't replace a recent fresh chain
+	if _chain_timer > CHAIN_THROTTLE:
+		return
+	_chain_label.text = _format_chain(steps)
+	_chain_bg.modulate.a = 1.0
+	_chain_bg.show()
+	_chain_timer = CHAIN_DISPLAY_DURATION
+
+func _format_chain(steps: Array) -> String:
+	if steps.is_empty():
+		return ""
+	var parts: Array[String] = []
+	# First step is Base — show its value
+	parts.append(str(steps[0]["value"]))
+	# Subsequent steps show "op (name) → value"
+	for i in range(1, steps.size()):
+		var s: Dictionary = steps[i]
+		parts.append("%s (%s)" % [s["op"], s["label"]])
+	# Final result
+	var final_val: int = steps[-1]["value"]
+	return "  ".join(parts) + "  =  " + str(final_val)
 
 func _refresh_pilots() -> void:
 	for i in _pilot_labels.size():

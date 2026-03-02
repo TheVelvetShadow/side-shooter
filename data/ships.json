@@ -1,0 +1,62 @@
+{
+	"interceptor": {
+		"id": "interceptor",
+		"name": "Interceptor",
+		"desc": "Balanced starter. Solid in every role.",
+		"hp": 100,
+		"speed": 300,
+		"weapon_slots": 2,
+		"armour": 0,
+		"weapon_bonus": 0,
+		"image": "res://assets/sprites/Ships/Spaceship_0.png",
+		"unlock": "always"
+	},
+	"tank": {
+		"id": "tank",
+		"name": "Tank",
+		"desc": "Armour plating absorbs flat damage. Slow but nearly unkillable.",
+		"hp": 200,
+		"speed": 200,
+		"weapon_slots": 2,
+		"armour": 15,
+		"weapon_bonus": 0,
+		"image": "res://assets/sprites/Ships/Spaceship_1.png",
+		"unlock": "ante1"
+	},
+	"glass_cannon": {
+		"id": "glass_cannon",
+		"name": "Glass Cannon",
+		"desc": "Maximum weapon bonus feeds pilot multipliers. Fragile.",
+		"hp": 60,
+		"speed": 320,
+		"weapon_slots": 3,
+		"armour": 0,
+		"weapon_bonus": 15,
+		"image": "res://assets/sprites/Ships/Spaceship_2.png",
+		"unlock": "ante2"
+	},
+	"scout": {
+		"id": "scout",
+		"name": "Scout",
+		"desc": "Exceptional speed. Dodge everything, rely on positioning.",
+		"hp": 75,
+		"speed": 420,
+		"weapon_slots": 2,
+		"armour": 0,
+		"weapon_bonus": 5,
+		"image": "res://assets/sprites/Ships/Spaceship_3.png",
+		"unlock": "ante3"
+	},
+	"dreadnought": {
+		"id": "dreadnought",
+		"name": "Dreadnought",
+		"desc": "Maximum weapon slots. Slow. Pilot synergies explode with 6 active weapons.",
+		"hp": 150,
+		"speed": 170,
+		"weapon_slots": 4,
+		"armour": 10,
+		"weapon_bonus": 5,
+		"image": "res://assets/sprites/Ships/Spaceship_4.png",
+		"unlock": "ante4"
+	}
+}

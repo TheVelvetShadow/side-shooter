@@ -47,3 +47,6 @@ signal waves_exhausted()
 signal game_over()
 signal run_completed()
 signal pilot_academy_closed
+
+# Damage chain (Balatro-style: fired per bullet hit when pilots modify damage)
+signal damage_chain_shown(steps: Array)

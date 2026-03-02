@@ -7,7 +7,8 @@
 		"cost": 20,
 		"desc": "+20% all bullet damage",
 		"effect": "damage_flat_pct",
-		"value": 0.20
+		"value": 0.20,
+		"image": "res://assets/sprites/Pilots/Pilot_1.png"
 	},
 	"shield_tech": {
 		"id": "shield_tech",
@@ -17,7 +18,8 @@
 		"cost": 20,
 		"desc": "+25 Max Shield",
 		"effect": "shield_boost",
-		"value": 25
+		"value": 25,
+		"image": "res://assets/sprites/Pilots/Pilot_1.png"
 	},
 	"ballistic_expert": {
 		"id": "ballistic_expert",
@@ -28,7 +30,8 @@
 		"desc": "×1.5 Ballistic damage",
 		"effect": "weapon_type_mult",
 		"value": 1.5,
-		"weapon_category": "ballistic"
+		"weapon_category": "ballistic",
+		"image": "res://assets/sprites/Pilots/Pilot_2.png"
 	},
 	"energy_specialist": {
 		"id": "energy_specialist",
@@ -39,7 +42,20 @@
 		"desc": "×1.5 Energy damage",
 		"effect": "weapon_type_mult",
 		"value": 1.5,
-		"weapon_category": "energy"
+		"weapon_category": "energy",
+		"image": "res://assets/sprites/Pilots/Pilot_2.png"
+	},
+	"fire_specialist": {
+		"id": "fire_specialist",
+		"name": "Fire Specialist",
+		"type": "weapon_type",
+		"rarity": "rare",
+		"cost": 40,
+		"desc": "×1.5 Fire damage",
+		"effect": "weapon_type_mult",
+		"value": 1.5,
+		"weapon_category": "fire",
+		"image": "res://assets/sprites/Pilots/Pilot_2.png"
 	},
 	"ricochet_artist": {
 		"id": "ricochet_artist",
@@ -49,7 +65,19 @@
 		"cost": 60,
 		"desc": "×2 damage on bounced shots",
 		"effect": "bounce_mult",
-		"value": 2.0
+		"value": 2.0,
+		"image": "res://assets/sprites/Pilots/Pilot_3.png"
+	},
+	"bounce_master": {
+		"id": "bounce_master",
+		"name": "Bounce Master",
+		"type": "conditional",
+		"rarity": "epic",
+		"cost": 60,
+		"desc": "×3 damage on bounced shots",
+		"effect": "bounce_mult",
+		"value": 3.0,
+		"image": "res://assets/sprites/Pilots/Pilot_3.png"
 	},
 	"afterburner": {
 		"id": "afterburner",
@@ -59,6 +87,7 @@
 		"cost": 40,
 		"desc": "+40 Move Speed",
 		"effect": "speed_boost",
-		"value": 40.0
+		"value": 40.0,
+		"image": "res://assets/sprites/Pilots/Pilot_2.png"
 	}
 }

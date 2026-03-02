@@ -48,6 +48,8 @@ GameManager="*uid://rk6wbj42n13h"
 WeaponDB="*res://scripts/weapons/WeaponDB.gd"
 LevelManager="*res://scripts/systems/LevelManager.gd"
 PilotManager="*res://scripts/systems/PilotManager.gd"
+EnemyDB="*res://scripts/systems/EnemyDB.gd"
+ShipDB="*res://scripts/systems/ShipDB.gd"
 
 [display]
 

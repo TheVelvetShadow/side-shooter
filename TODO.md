@@ -68,31 +68,35 @@ _(nothing)_
 
 ## 📋 PHASE D — Pilot System (Full)
 
-> 6 pilots implemented. Full 100+ pool, combos, and damage chain UI still pending.
+> 8 pilots implemented. Full 100+ pool still pending (user fills spreadsheet). Combos and damage chain UI complete.
 
 ### Data
-- [x] `data/pilots.json` — 6 pilots (power_surge, shield_tech, ballistic_expert, energy_specialist, ricochet_artist, afterburner)
+- [x] `data/pilots.json` — 8 pilots (power_surge, shield_tech, ballistic_expert, energy_specialist, fire_specialist, ricochet_artist, bounce_master, afterburner)
 - [x] `data/game_data.xlsx` Pilots sheet — template ready, 6 existing + blank rows for 100+ target
 - [ ] Fill pilot pool in game_data.xlsx → import to pilots.json (user fills spreadsheet first)
-- [ ] Pilot rarity weights: Common 70% / Rare 25% / Epic 4.5% / Legendary 0.5%
-- [ ] Fire Specialist pilot (weapon_type, fire category) — once fire weapon type implemented
-- [ ] Pilot unlock tracking (meta-progression)
+- [x] Pilot rarity weights: Common 70% / Rare 25% / Epic 4.5% / Legendary 0.5%
+- [x] Fire Specialist pilot — weapon_type / fire / rare / ×1.5
+- [ ] Pilot unlock tracking (meta-progression — deferred to Phase H)
 
 ### Pilot Manager
 - [x] `PilotManager` autoload — roster (max 5), apply_pilots(), get_bounce_multiplier(), add_pilot(), reset()
-- [ ] Full order of ops: Flat → Type × → Conditional × → Combo ×
-- [ ] Combo detection after every roster change
+- [x] Full order of ops: Flat → Type × → Conditional × → Combo × (combo stub, no combos defined yet)
+- [x] get_damage_chain() returns step-by-step chain dict; get_bounce_chain_steps() appends at hit time
+- [x] get_weighted_offers(n) — rarity-weighted sampling (common 70 / rare 25 / epic 4.5 / legendary 0.5)
+- [x] replace_pilot(index, new_pilot, player) — for swap in Academy
+- [x] Combo detection after every roster change (active_combos updated on add/replace/reset)
 
 ### Pilot Types
 - [x] Global — power_surge, shield_tech, afterburner
-- [x] Weapon Type — ballistic_expert, energy_specialist
-- [x] Conditional — ricochet_artist (bounce ×2)
-- [ ] Fire Specialist (weapon_type, fire)
-- [ ] Combo pilots
+- [x] Weapon Type — ballistic_expert, energy_specialist, fire_specialist
+- [x] Conditional — ricochet_artist (bounce ×2), bounce_master (bounce ×3)
+- [x] Combo — The Infinite Bouncer (ricochet_artist + bounce_master → ×1.5 extra on bounced shots)
 
 ### UI
 - [x] Active pilot names shown in HUD
-- [ ] **Damage chain UI** — `12 → ×2 (Ballistic) → ×3 (Bounce) = 72` shown per shot
+- [x] **Damage chain UI** — `10 → +20% (Power Surge) → ×1.5 (Ballistic Expert) = 18` top-right HUD, fades after 2s
+- [x] Pilot portrait images on Academy cards (Pilot_1/2/3.png by rarity)
+- [x] Pilot swap — "Swap" button when roster full; overlay shows active roster to replace
 
 ---
 
@@ -135,9 +139,9 @@ _(nothing)_
 - [x] BigBoss.gd / BigBoss.tscn — 2000 HP, _draw() visuals, patrol, drops 16 gems
 - [x] Boss HP bar in HUD, boss signals in EventBus, difficulty scaling on spawn
 
-### 📋 Real Boss Designs
-- [ ] Mini Boss attack pattern (burst fire / charge)
-- [ ] Big Boss multi-phase attack pattern
+### ✅ Real Boss Designs
+- [x] Mini Boss attack pattern: ENTERING → PATROL → BURST_FIRE (3 shots) → CHARGE → RECOVER state machine
+- [x] Big Boss 3-phase: Phase 1 burst×3, Phase 2 (50% HP) spread×5+charge, Phase 3 (25% HP) fan×7+rapid fire+visual tint
 - [ ] Boss 1: Fortress Station (Ante 1 L3)
 - [ ] Boss 2: Battlecruiser (Ante 2 L3)
 - [ ] Boss 3: Mothership (Ante 3 L3)
@@ -146,13 +150,16 @@ _(nothing)_
 
 ---
 
-## 📋 PHASE G — Ship Selection
+## ✅ PHASE G — Ship Selection
 
-- [ ] Ship selection screen before run
-- [ ] Ship stats: HP, speed, weapon slots, armour, weapon bonus
-- [ ] Ship 1 — Interceptor (starter)
-- [ ] Ships 2–8 — meta unlocks (Tank, Glass Cannon, Scout, Dreadnought, TBD ×3)
-- [ ] Ship weapon bonus → damage formula (flat add before pilot multipliers)
+- [x] Ship selection screen before run (ShipSelectUI.gd — full-screen overlay, ship cards with portraits + stats)
+- [x] Ship stats: HP, speed, weapon_slots, armour, weapon_bonus — all wired to Player
+- [x] Ships 1–5 — Interceptor (always), Tank, Glass Cannon, Scout, Dreadnought (all unlocked for now)
+- [x] Ship weapon_bonus → flat addition to base_damage before pilot chain
+- [x] Player.armour → flat reduction per hit (minimum 1 damage)
+- [x] data/ships.json + ShipDB autoload
+- [ ] Ships 6–8 — TBD stats (deferred)
+- [ ] Lock/unlock gating against Phase H save system
 
 ---
 

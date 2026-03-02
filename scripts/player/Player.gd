@@ -8,6 +8,9 @@ const MAX_SLOTS: int = 6
 @export var attack_multiplier: float = 1.0
 @export var move_speed: float = 300.0
 
+var armour: int = 0          # flat damage reduction per hit (from ship stat)
+var weapon_bonus: int = 0    # flat bonus added to all weapon damage before pilot chain
+
 var current_hp: int
 var current_shield: int
 
@@ -60,8 +63,11 @@ func _fire_from_slot(slot: int) -> void:
 		return
 	var weapon: Dictionary = weapon_slots[slot]
 	var bullet = bullet_scene.instantiate()
-	var base_damage := int(weapon["damage"] * attack_multiplier)
-	bullet.damage = PilotManager.apply_pilots(base_damage, weapon.get("category", weapon.get("type", "")))
+	var base_damage := int(weapon["damage"] * attack_multiplier) + weapon_bonus
+	var weapon_type: String = weapon.get("category", weapon.get("type", ""))
+	var chain := PilotManager.get_damage_chain(base_damage, weapon_type)
+	bullet.damage = chain["final"]
+	bullet.damage_chain = chain["steps"]
 	bullet.bounce_damage_multiplier = PilotManager.get_bounce_multiplier()
 	bullet.burn_pct      = weapon.get("burn_pct", 0.0)
 	bullet.burn_duration = weapon.get("burn_duration", 0.0)
@@ -127,7 +133,19 @@ func unlock_slot() -> void:
 		unlocked_slots += 1
 		EventBus.weapon_equipped.emit(unlocked_slots - 1, null)
 
+func apply_ship(ship_data: Dictionary) -> void:
+	max_hp        = int(ship_data.get("hp",           max_hp))
+	move_speed    = float(ship_data.get("speed",      move_speed))
+	armour        = int(ship_data.get("armour",       armour))
+	weapon_bonus  = int(ship_data.get("weapon_bonus", weapon_bonus))
+	unlocked_slots = int(ship_data.get("weapon_slots", unlocked_slots))
+	current_hp    = max_hp
+	current_shield = max_shield
+	EventBus.player_hp_changed.emit(current_hp, max_hp)
+	EventBus.player_shield_changed.emit(current_shield, max_shield)
+
 func take_damage(amount: int) -> void:
+	amount = maxi(amount - armour, 1)  # armour reduces but never below 1
 	if current_shield > 0:
 		var shield_absorbed := mini(current_shield, amount)
 		current_shield -= shield_absorbed

@@ -7,8 +7,8 @@ const SHIP_UPGRADES: Array[Dictionary] = [
 	{"label": "+10% Dmg Bonus", "cost": 40, "effect": "attack"},
 ]
 
-const BG_COLOR    := Color(0.04, 0.05, 0.12, 1.0)   # deep navy — fully opaque
-const ACCENT      := Color(0.9,  0.8,  0.3,  1.0)   # gold
+const BG_COLOR    := Color(0.04, 0.05, 0.12, 1.0)
+const ACCENT      := Color(0.9,  0.8,  0.3,  1.0)
 const DIM_TEXT    := Color(0.55, 0.55, 0.65, 1.0)
 
 var _credits_label: Label
@@ -21,9 +21,15 @@ var _continue_btn: Button
 var _current_ante: int = 1
 var _current_level: int = 1
 
+# Swap state
+var _swap_panel: Panel
+var _swap_roster_container: VBoxContainer
+var _pending_swap_pilot: Dictionary = {}
+
 func _ready() -> void:
 	visible = false
 	_build_screen()
+	_build_swap_panel()
 	EventBus.level_completed.connect(_on_level_completed)
 
 func _build_screen() -> void:
@@ -176,6 +182,80 @@ func _make_separator() -> HSeparator:
 	sep.modulate = Color(0.25, 0.25, 0.4, 1.0)
 	return sep
 
+# ── Swap panel ────────────────────────────────────────────────────────────────
+
+func _build_swap_panel() -> void:
+	_swap_panel = Panel.new()
+	_swap_panel.anchor_left   = 0.5
+	_swap_panel.anchor_right  = 0.5
+	_swap_panel.anchor_top    = 0.5
+	_swap_panel.anchor_bottom = 0.5
+	_swap_panel.offset_left   = -220.0
+	_swap_panel.offset_right  = 220.0
+	_swap_panel.offset_top    = -180.0
+	_swap_panel.offset_bottom = 180.0
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.07, 0.08, 0.18, 0.97)
+	style.border_color = ACCENT
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(6)
+	_swap_panel.add_theme_stylebox_override("panel", style)
+
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for side in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+		vbox.add_theme_constant_override(side, 20)
+	vbox.add_theme_constant_override("separation", 14)
+	_swap_panel.add_child(vbox)
+
+	var title := Label.new()
+	title.text = "Replace which pilot?"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 18)
+	title.modulate = ACCENT
+	vbox.add_child(title)
+
+	vbox.add_child(HSeparator.new())
+
+	_swap_roster_container = VBoxContainer.new()
+	_swap_roster_container.add_theme_constant_override("separation", 8)
+	vbox.add_child(_swap_roster_container)
+
+	vbox.add_child(HSeparator.new())
+
+	var cancel_btn := Button.new()
+	cancel_btn.text = "Cancel"
+	cancel_btn.pressed.connect(func(): _swap_panel.hide())
+	vbox.add_child(cancel_btn)
+
+	_swap_panel.visible = false
+	add_child(_swap_panel)
+
+func _show_swap_panel(offer_pilot: Dictionary) -> void:
+	_pending_swap_pilot = offer_pilot
+	for c in _swap_roster_container.get_children():
+		c.queue_free()
+	for i in PilotManager.active_pilots.size():
+		var p: Dictionary = PilotManager.active_pilots[i]
+		var btn := Button.new()
+		btn.text = "%s  (%s)" % [p["name"], p.get("rarity", "").capitalize()]
+		btn.pressed.connect(_on_swap_target_selected.bind(i))
+		_swap_roster_container.add_child(btn)
+	_swap_panel.show()
+
+func _on_swap_target_selected(index: int) -> void:
+	if not GameManager.spend_credits(_pending_swap_pilot["cost"]):
+		_swap_panel.hide()
+		return
+	var player := get_tree().get_first_node_in_group("player")
+	PilotManager.replace_pilot(index, _pending_swap_pilot, player)
+	_swap_panel.hide()
+	_refresh_credits()
+	_refresh_roster()
+	_show_offers()
+
+# ── Level completed ───────────────────────────────────────────────────────────
+
 func _on_level_completed(ante: int, level: int) -> void:
 	_current_ante  = ante
 	_current_level = level
@@ -192,22 +272,19 @@ func _on_level_completed(ante: int, level: int) -> void:
 func _show_offers() -> void:
 	for c in _offers_container.get_children():
 		c.queue_free()
-	var available := PilotManager.get_available_pilots()
-	available.shuffle()
-	var offers := available.slice(0, min(3, available.size()))
+	var offers := PilotManager.get_weighted_offers(3)
 	for pilot in offers:
 		_offers_container.add_child(_build_pilot_card(pilot))
 
 func _build_pilot_card(pilot: Dictionary) -> Panel:
 	var card := Panel.new()
-	card.custom_minimum_size = Vector2(200, 240)
+	card.custom_minimum_size = Vector2(200, 300)
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
-	# Slightly lighter panel background
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.1, 0.11, 0.22, 1.0)
-	style.border_color = Color(0.25, 0.25, 0.45, 1.0)
-	style.set_border_width_all(1)
+	style.border_color = _rarity_color(pilot.get("rarity", "common"))
+	style.set_border_width_all(2)
 	style.set_corner_radius_all(4)
 	card.add_theme_stylebox_override("panel", style)
 
@@ -221,6 +298,18 @@ func _build_pilot_card(pilot: Dictionary) -> Panel:
 	inner.add_theme_constant_override("separation", 8)
 	mc.add_child(inner)
 
+	# Pilot portrait
+	var image_path: String = pilot.get("image", "")
+	if image_path != "":
+		var tex_rect := TextureRect.new()
+		tex_rect.custom_minimum_size = Vector2(0, 100)
+		tex_rect.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		var tex := load(image_path) as Texture2D
+		if tex:
+			tex_rect.texture = tex
+		inner.add_child(tex_rect)
+
 	var name_lbl := Label.new()
 	name_lbl.text = pilot["name"]
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -232,7 +321,7 @@ func _build_pilot_card(pilot: Dictionary) -> Panel:
 	type_lbl.text = "%s  ·  %s" % [pilot["type"].capitalize(), pilot.get("rarity", "").capitalize()]
 	type_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	type_lbl.add_theme_font_size_override("font_size", 11)
-	type_lbl.modulate = DIM_TEXT
+	type_lbl.modulate = _rarity_color(pilot.get("rarity", "common"))
 	inner.add_child(type_lbl)
 
 	inner.add_child(HSeparator.new())
@@ -254,12 +343,25 @@ func _build_pilot_card(pilot: Dictionary) -> Panel:
 	var roster_full: bool = PilotManager.active_pilots.size() >= PilotManager.MAX_PILOTS
 	var can_afford: bool  = GameManager.credits >= int(pilot["cost"])
 	var hire_btn := Button.new()
-	hire_btn.text = "Hire"
-	hire_btn.disabled = not can_afford or roster_full
-	hire_btn.pressed.connect(_on_pilot_buy.bind(pilot, hire_btn))
+	if roster_full:
+		hire_btn.text = "Swap"
+		hire_btn.disabled = not can_afford
+		hire_btn.pressed.connect(_show_swap_panel.bind(pilot))
+	else:
+		hire_btn.text = "Hire"
+		hire_btn.disabled = not can_afford
+		hire_btn.pressed.connect(_on_pilot_buy.bind(pilot, hire_btn))
 	inner.add_child(hire_btn)
 
 	return card
+
+func _rarity_color(rarity: String) -> Color:
+	match rarity:
+		"common":    return Color(0.55, 0.55, 0.65, 1.0)
+		"rare":      return Color(0.25, 0.55, 1.0,  1.0)
+		"epic":      return Color(0.7,  0.3,  1.0,  1.0)
+		"legendary": return Color(1.0,  0.75, 0.1,  1.0)
+		_:           return Color(0.55, 0.55, 0.65, 1.0)
 
 func _on_pilot_buy(pilot: Dictionary, hire_btn: Button) -> void:
 	if not GameManager.spend_credits(pilot["cost"]):
@@ -313,21 +415,8 @@ func _refresh_upgrade_buttons() -> void:
 			_upgrade_btns[i].disabled = GameManager.credits < SHIP_UPGRADES[i]["cost"]
 
 func _refresh_offer_buttons_for_roster() -> void:
-	if PilotManager.active_pilots.size() < PilotManager.MAX_PILOTS:
-		return
-	for card in _offers_container.get_children():
-		var btn := _get_card_hire_btn(card)
-		if btn and not btn.disabled:
-			btn.disabled = true
-
-func _get_card_hire_btn(card: Panel) -> Button:
-	var mc := card.get_child(0)
-	if mc == null:
-		return null
-	var inner := mc.get_child(0)
-	if inner == null:
-		return null
-	return inner.get_child(inner.get_child_count() - 1) as Button
+	# Rebuild cards so Hire→Swap transitions are reflected
+	_show_offers()
 
 func _on_continue_pressed() -> void:
 	visible = false
