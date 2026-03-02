@@ -37,7 +37,7 @@ ui_down={
 [application]
 
 config/name="Side Shooter"
-run/main_scene="uid://wyj3wlktp26a"
+run/main_scene="uid://mainmenu001tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

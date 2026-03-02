@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://mainmenu001tscn"]
+
+[ext_resource type="Script" path="res://scripts/ui/MainMenu.gd" id="1_mainmenu"]
+[ext_resource type="PackedScene" uid="uid://dokhrnxnwmoym" path="res://scenes/background/parallax.tscn" id="2_parallax"]
+
+[node name="MainMenu" type="Node"]
+script = ExtResource("1_mainmenu")
+
+[node name="ParallaxBackground" parent="." instance=ExtResource("2_parallax")]

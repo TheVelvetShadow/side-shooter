@@ -36,9 +36,10 @@ func _load_ships() -> void:
 		push_error("ShipSelectUI: failed to parse ships.json")
 
 func _get_ordered_ships() -> Array[Dictionary]:
+	# Only include unlocked ships — locked ships are not shown at all
 	var result: Array[Dictionary] = []
 	for id in SHIP_ORDER:
-		if _ships.has(id):
+		if _ships.has(id) and id in UNLOCKED_SHIPS:
 			result.append(_ships[id])
 	return result
 
@@ -119,7 +120,6 @@ func _build_ui() -> void:
 
 func _build_ship_card(ship: Dictionary) -> Panel:
 	var ship_id: String = ship["id"]
-	var is_locked: bool = ship_id not in UNLOCKED_SHIPS
 
 	var card := Panel.new()
 	card.custom_minimum_size = Vector2(220, 0)
@@ -127,8 +127,8 @@ func _build_ship_card(ship: Dictionary) -> Panel:
 	card.size_flags_vertical   = Control.SIZE_EXPAND_FILL
 
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.09, 0.10, 0.20, 1.0) if not is_locked else Color(0.06, 0.06, 0.12, 1.0)
-	style.border_color = DIM_TEXT if not is_locked else LOCKED_C
+	style.bg_color = Color(0.09, 0.10, 0.20, 1.0)
+	style.border_color = DIM_TEXT
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(6)
 	card.add_theme_stylebox_override("panel", style)
@@ -161,24 +161,14 @@ func _build_ship_card(ship: Dictionary) -> Panel:
 		var tex := load(img_path) as Texture2D
 		if tex:
 			tex_rect.texture = tex
-	if is_locked:
-		tex_rect.modulate = Color(0.3, 0.3, 0.3, 1.0)
 	portrait_container.add_child(tex_rect)
-
-	if is_locked:
-		var lock_lbl := Label.new()
-		lock_lbl.text = "LOCKED"
-		lock_lbl.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-		lock_lbl.add_theme_font_size_override("font_size", 18)
-		lock_lbl.modulate = Color(0.8, 0.6, 0.2, 1.0)
-		portrait_container.add_child(lock_lbl)
 
 	# Name
 	var name_lbl := Label.new()
 	name_lbl.text = ship["name"]
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.add_theme_font_size_override("font_size", 20)
-	name_lbl.modulate = ACCENT if not is_locked else LOCKED_C
+	name_lbl.modulate = ACCENT
 	vbox.add_child(name_lbl)
 
 	# Desc
@@ -215,14 +205,13 @@ func _build_ship_card(ship: Dictionary) -> Panel:
 		var val_lbl := Label.new()
 		val_lbl.text = stat[1]
 		val_lbl.add_theme_font_size_override("font_size", 13)
-		val_lbl.modulate = Color(1.0, 1.0, 1.0, 1.0) if not is_locked else LOCKED_C
+		val_lbl.modulate = Color(1.0, 1.0, 1.0, 1.0)
 		row.add_child(val_lbl)
 
 	vbox.add_child(HSeparator.new())
 
 	var btn := Button.new()
-	btn.text = "Select" if not is_locked else "Locked"
-	btn.disabled = is_locked
+	btn.text = "Select"
 	btn.custom_minimum_size = Vector2(0, 36)
 	btn.pressed.connect(_on_ship_card_pressed.bind(ship_id))
 	vbox.add_child(btn)
@@ -237,14 +226,13 @@ func _highlight_selected() -> void:
 	for id in _card_panels:
 		var card := _card_panels[id] as Panel
 		var style := StyleBoxFlat.new()
-		var is_locked: bool = id not in UNLOCKED_SHIPS
 		if id == _selected_id:
 			style.bg_color = Color(0.12, 0.13, 0.28, 1.0)
 			style.border_color = ACCENT
 			style.set_border_width_all(3)
 		else:
-			style.bg_color = Color(0.06, 0.06, 0.12, 1.0) if is_locked else Color(0.09, 0.10, 0.20, 1.0)
-			style.border_color = LOCKED_C if is_locked else DIM_TEXT
+			style.bg_color = Color(0.09, 0.10, 0.20, 1.0)
+			style.border_color = DIM_TEXT
 			style.set_border_width_all(1)
 		style.set_corner_radius_all(6)
 		card.add_theme_stylebox_override("panel", style)

@@ -209,7 +209,7 @@ _(nothing)_
 ---
 
 ## 🐛 KNOWN BUGS / BLOCKERS
-- [ ] 2193 debug notices on startup — investigate source
+- [x] 2193 debug notices on startup — resolved
 - [ ] Shift key weapon slot switch — remove once all slots fire simultaneously by default
 - [x] Double-damage bug on KamikazeDrone + TurretPlatform — removed redundant area_entered bullet handlers; Bullet.gd is sole authority for bullet hit detection
 
