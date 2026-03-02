@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(awk NR==84:*)",
+      "Bash(open:*)",
+      "Bash(python3:*)",
+      "Bash(pip3 install:*)"
     ]
   }
 }

@@ -2,8 +2,28 @@
 
 [ext_resource type="Script" path="res://scripts/ui/MainMenu.gd" id="1_mainmenu"]
 [ext_resource type="PackedScene" uid="uid://dokhrnxnwmoym" path="res://scenes/background/parallax.tscn" id="2_parallax"]
+[ext_resource type="Script" path="res://scripts/systems/VignetteOverlay.gd" id="3_vignette"]
+
+[sub_resource type="Environment" id="1_env"]
+background_mode = 1
+background_color = Color(0.008, 0.008, 0.02, 1)
+ambient_light_color = Color(0.02, 0.02, 0.06, 1)
+ambient_light_energy = 1.0
+glow_enabled = true
+glow_normalized = false
+glow_intensity = 1.0
+glow_bloom = 0.1
+glow_blend_mode = 2
+glow_hdr_threshold = 0.7
+glow_hdr_scale = 2.0
 
 [node name="MainMenu" type="Node"]
 script = ExtResource("1_mainmenu")
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("1_env")
+
 [node name="ParallaxBackground" parent="." instance=ExtResource("2_parallax")]
+
+[node name="VignetteOverlay" type="CanvasLayer" parent="."]
+script = ExtResource("3_vignette")

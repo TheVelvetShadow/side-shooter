@@ -9,9 +9,26 @@
 [ext_resource type="PackedScene" uid="uid://dys6m8uk87vth" path="res://scenes/ui/LevelUpUI.tscn" id="9_levelup"]
 [ext_resource type="PackedScene" path="res://scenes/ui/WeaponUpgradeUI.tscn" id="10_wupgrade"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PilotAcademy.tscn" id="11_pacademy"]
+[ext_resource type="Script" path="res://scripts/systems/VignetteOverlay.gd" id="13_vignette"]
+
+[sub_resource type="Environment" id="1_env"]
+background_mode = 1
+background_color = Color(0.008, 0.008, 0.02, 1)
+ambient_light_color = Color(0.02, 0.02, 0.06, 1)
+ambient_light_energy = 1.0
+glow_enabled = true
+glow_normalized = false
+glow_intensity = 1.0
+glow_bloom = 0.1
+glow_blend_mode = 2
+glow_hdr_threshold = 0.7
+glow_hdr_scale = 2.0
 
 [node name="Main" type="Node" unique_id=641290497]
 script = ExtResource("1_maingd")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("1_env")
 
 [node name="ParallaxBackground" parent="." unique_id=1767133872 instance=ExtResource("2_85g3d")]
 
@@ -27,6 +44,9 @@ position = Vector2(16, 23)
 [node name="WeaponUpgradeUI" parent="." unique_id=167407262 instance=ExtResource("10_wupgrade")]
 
 [node name="PilotAcademy" parent="." unique_id=1187321609 instance=ExtResource("11_pacademy")]
+
+[node name="VignetteOverlay" type="CanvasLayer" parent="."]
+script = ExtResource("13_vignette")
 
 [node name="DebugMenu" type="CanvasLayer" parent="." unique_id=999888777]
 script = ExtResource("12_debugmenu")

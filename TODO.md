@@ -9,7 +9,30 @@
 ---
 
 ## 🔴 IN PROGRESS
-_(nothing)_
+
+### 🗂 game_data.xlsx — FILLING IN PROGRESS (user)
+All of the below is blocked on spreadsheet completion:
+- [ ] **Weapon merge table** — which weapon + weapon → new weapon (new weapon types/tiers unlocked via merging)
+- [ ] **Pilot pool** — 100+ pilots across all rarities, types, effects
+- [ ] **Enemy roster** — all enemy types with stats, movement, shoot patterns, spawn weights, per-ante availability
+- [ ] **Level composition** — which enemies appear in which ante/level, wave counts, difficulty curve
+- [ ] **Boss designs** — 3 Big Boss variants (Fortress Station, Battlecruiser, Mothership) + 16 Mini Boss variants
+
+### 🎨 UI Redesign — NEXT UP
+Design confirmed (Classic layout). All builds pending:
+- [ ] **HUD redesign** — HP/shield top-left with styled bars, boss bar top-centre (wider/dramatic), weapon slots bottom strip, pilot tags below HP bars, damage chain top-right
+- [ ] **WeaponUpgradeUI redesign** — fully programmatic rebuild; larger cards with type-colour header, icon area, name/desc/stat rows
+- [ ] **LevelUpUI redesign** — same treatment as WeaponUpgradeUI
+- [ ] **Pause menu** — new; ESC key; Resume / Settings / Quit to Menu; process_mode=ALWAYS
+- [ ] **Game Over screen redesign** — full-screen THE VOID aesthetic, score, run stats
+- [ ] **Run summary screen** — new; shown after clearing all 3 antes
+
+### 🔍 Content audit — planned after spreadsheet
+Go through each entity one by one to verify correct visuals, animations, movement, spawning:
+- [ ] Each enemy type — movement, attack pattern, sprite/visual, spawn behaviour
+- [ ] Each weapon — stats, bullet visual, fire pattern, special behaviour (AOE, homing, burn, split)
+- [ ] Each ship — portrait, stats correct, armour/bonus working
+- [ ] Each boss — phases, attack patterns, visual, entry/death
 
 ---
 
@@ -61,8 +84,8 @@ _(nothing)_
 - [x] 4 ship stat upgrade rows (HP / Speed / Weapon Slot / Dmg Bonus)
 - [x] Credits display + continue button with contextual label
 - [x] Active pilot roster shown at bottom
-- [ ] Pilot swap — replace active pilot with offer (deferred to Phase D)
-- [ ] Weapon merging — same type + tier → next tier, costs credits (deferred to Phase D)
+- [x] Pilot swap — "Swap" button when roster full; overlay shows active roster to replace
+- [ ] Weapon merging — blocked on game_data.xlsx merge table (which weapons combine into which new weapons)
 
 ---
 
@@ -179,10 +202,29 @@ _(nothing)_
 - [ ] Visual effects — explosions, bullet trails, bounce flash, burn particles
 - [ ] Per-weapon AnimatedSprite2D bullets (coordinate with assets)
 - [ ] Audio — music, SFX per weapon type, SFX on pilot trigger
-- [ ] Main menu
 - [ ] Tutorial / onboarding
 - [ ] Balance pass — use Card Simulator sheet in game_data.xlsx
 - [ ] Achievement system
+
+### 💡 Atmospherics & Lighting (Limbo / Hollow Knight style)
+Goal: deep dark space with reactive dynamic lighting. Most of this is visual-feedback driven — iterate with user after each step.
+
+**Step 1 — Background & WorldEnvironment (do first)**
+- [x] **Parallax colour tinting** — far layer deep blue-purple `Color(0.5, 0.6, 0.9)`, mid purple-magenta `Color(0.4, 0.35, 0.7)`, near silhouette `Color(0.15, 0.12, 0.25)` — tweak to taste
+- [x] **WorldEnvironment** — add to main.tscn; `glow_enabled=true`, `glow_bloom=0.1`, `glow_hdr_threshold=0.7`, dark ambient `Color(0.02, 0.02, 0.05)`. Forward Plus renderer so this works in 2D automatically.
+- [x] **Vignette shader overlay** — CanvasLayer (layer 98) with full-rect ColorRect + `assets/shaders/vignette.gdshader`. Shader: UV→centred coords, radial dot product, pow curve, outputs black with alpha = (1-vignette). Strength param ~1.2.
+
+**Step 2 — Reactive lighting (visual-feedback phase)**
+- [ ] **CanvasLight2D on player** — soft ambient glow around ship (blob texture, energy ~0.8, cyan/blue)
+- [ ] **CanvasLight2D on bullets** — small point light per bullet in flight; colour matches weapon type; profile performance (one light per live bullet — may need pooling)
+- [ ] **CanvasLight2D on explosions** — flash on AOE/death; Tween energy 2.0→0 over ~0.3s
+- [ ] **Ambient dust particles** — GPUParticles2D, ~30 particles, tiny 2-4px dots, slow leftward drift. Subtle depth vibe.
+- [ ] **LightOccluder2D** — try on solid game elements; only if shadow casting looks good in testing
+
+**Notes:**
+- `CanvasLight2D` needs `item_cull_mask` to match sprite `light_mask` (both default to layer 1 — should work)
+- For bullet lights: consider only lighting bullets of high-tier weapons to control draw calls
+- Fog bands (horizontal gradient overlays) are optional — only add if space feels too clean after Step 1
 
 ---
 
