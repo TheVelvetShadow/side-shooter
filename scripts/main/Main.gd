@@ -1,11 +1,17 @@
 extends Node
 
-const CrosshairScript  := preload("res://scripts/ui/Crosshair.gd")
-const ShipSelectScript := preload("res://scripts/ui/ShipSelectUI.gd")
+const CrosshairScript   := preload("res://scripts/ui/Crosshair.gd")
+const ShipSelectScript  := preload("res://scripts/ui/ShipSelectUI.gd")
+const ConsoleScript     := preload("res://scripts/ui/DebugConsole.gd")
 
 func _ready() -> void:
 	EventBus.game_over.connect(_on_game_over)
 	EventBus.level_started.connect(_on_level_started)
+
+	if OS.is_debug_build():
+		var console := CanvasLayer.new()
+		console.set_script(ConsoleScript)
+		add_child(console)
 
 	if OS.is_debug_build() and GameManager.skip_ship_select:
 		var ship_data := ShipDB.get_ship(GameManager.debug_default_ship)

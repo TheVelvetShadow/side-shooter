@@ -56,7 +56,7 @@ func _handle_firing(delta: float) -> void:
 		slot_timers[i] -= delta
 		if slot_timers[i] <= 0.0:
 			_fire_from_slot(i)
-			slot_timers[i] = weapon_slots[i]["fire_rate"]
+			slot_timers[i] = weapon_slots[i]["fire_rate"] / PilotManager.get_fire_rate_mult()
 
 func _fire_from_slot(slot: int) -> void:
 	if not bullet_scene:
@@ -77,16 +77,19 @@ func _fire_from_slot(slot: int) -> void:
 	bullet.split_count     = weapon.get("split_count", 0)
 	bullet.split_spread    = weapon.get("split_spread", 45.0)
 	bullet.split_child_damage = weapon.get("split_child_damage", -1)
-	bullet.speed = weapon["bullet_speed"]
+	bullet.speed = move_speed * 2.0
 	bullet.bullet_color = weapon["color"]
 	bullet.weapon_slot = slot
 	bullet.global_position = bullet_spawn.global_position
 	get_tree().root.add_child(bullet)
-	var crosshairs := get_tree().get_nodes_in_group("crosshair")
-	if crosshairs.size() > 0:
-		var to_target: Vector2 = (crosshairs[0] as Node2D).global_position - bullet_spawn.global_position
-		if to_target.length() > 1.0:
-			bullet.velocity = to_target.normalized() * bullet.speed
+	if GameManager.aiming_enabled:
+		var crosshairs := get_tree().get_nodes_in_group("crosshair")
+		if crosshairs.size() > 0:
+			var to_target: Vector2 = (crosshairs[0] as Node2D).global_position - bullet_spawn.global_position
+			if to_target.length() > 1.0:
+				bullet.velocity = to_target.normalized() * bullet.speed
+	else:
+		bullet.velocity = Vector2.LEFT * bullet.speed
 	EventBus.bullet_fired.emit({"position": bullet_spawn.global_position})
 
 func equip_weapon(weapon_data: Dictionary) -> void:

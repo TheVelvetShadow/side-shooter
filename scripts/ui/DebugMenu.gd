@@ -2,7 +2,6 @@ extends CanvasLayer
 
 var _panel: PanelContainer
 var _god_btn: Button
-var god_mode: bool = false
 
 # Tracks the CheckButton for each enemy so Solo can refresh them all
 var _enemy_checks: Dictionary = {}   # enemy_id -> CheckButton
@@ -23,7 +22,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 func _on_player_damaged(amount: int) -> void:
-	if not god_mode:
+	if not GameManager.god_mode:
 		return
 	var player := get_tree().get_first_node_in_group("player") as Player
 	if player:
@@ -275,10 +274,10 @@ func _trigger_weapon_upgrade() -> void:
 	GameManager._check_weapon_upgrade()
 
 func _toggle_god_mode() -> void:
-	god_mode = not god_mode
-	_god_btn.text = "God Mode: ON" if god_mode else "God Mode: OFF"
+	GameManager.god_mode = not GameManager.god_mode
+	_god_btn.text = "God Mode: ON" if GameManager.god_mode else "God Mode: OFF"
 	_god_btn.add_theme_color_override(
-		"font_color", Color(0.2, 1.0, 0.2) if god_mode else Color(1.0, 1.0, 1.0)
+		"font_color", Color(0.2, 1.0, 0.2) if GameManager.god_mode else Color(1.0, 1.0, 1.0)
 	)
 
 func _make_enemy_row(enemy_id: String, enemy_type: String) -> HBoxContainer:

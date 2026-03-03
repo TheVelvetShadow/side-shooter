@@ -21,6 +21,8 @@ var upgrades_enabled: bool = true       # skip weapon upgrade card menu when fal
 var skip_ship_select: bool = true       # skip ship select screen on run start
 var debug_default_ship: String = "interceptor"
 var show_enemy_labels: bool = true      # draw name tags above enemies
+var aiming_enabled: bool = false        # when false, bullets fire straight left
+var god_mode: bool = false              # negate all incoming player damage
 
 # --- Flock parameters (live-tweakable) ---
 var flock_radius: float      = 130.0   # neighbourhood search radius
