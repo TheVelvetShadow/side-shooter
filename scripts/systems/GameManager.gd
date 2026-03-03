@@ -15,6 +15,7 @@ var credits: int = 0
 # --- Weapon XP (global upgrade bar, filled by energy gems) ---
 var weapon_xp: int = 0
 var weapon_xp_threshold: int = 100
+var upgrades_enabled: bool = true   # debug toggle — skip upgrade cards when false
 
 # --- Ship level (in-run, drives LevelUpUI stat upgrades) ---
 var ship_level: int = 1
@@ -98,7 +99,8 @@ func _check_weapon_upgrade() -> void:
 		return
 	weapon_xp -= weapon_xp_threshold
 	weapon_xp_threshold = int(weapon_xp_threshold * 1.10)
-	EventBus.weapon_upgrade_available.emit(0)
+	if upgrades_enabled:
+		EventBus.weapon_upgrade_available.emit(0)
 	EventBus.weapon_xp_bar_updated.emit(weapon_xp, weapon_xp_threshold)
 
 func _on_player_died() -> void:

@@ -4,6 +4,9 @@ var _panel: PanelContainer
 var _god_btn: Button
 var god_mode: bool = false
 
+# Tracks the CheckButton for each enemy so Solo can refresh them all
+var _enemy_checks: Dictionary = {}   # enemy_id -> CheckButton
+
 func _ready() -> void:
 	layer = 100
 	process_mode = PROCESS_MODE_ALWAYS
@@ -105,6 +108,64 @@ func _build_ui() -> void:
 	kill_btn.pressed.connect(_kill_all_enemies)
 	row2.add_child(kill_btn)
 
+	vbox.add_child(HSeparator.new())
+
+	# Upgrades toggle
+	vbox.add_child(HSeparator.new())
+	var upgrades_label := Label.new()
+	upgrades_label.text = "UPGRADES"
+	upgrades_label.add_theme_color_override("font_color", Color(0.7, 0.9, 1.0))
+	vbox.add_child(upgrades_label)
+
+	var upgrades_check := CheckButton.new()
+	upgrades_check.text = "Weapon upgrade cards"
+	upgrades_check.button_pressed = GameManager.upgrades_enabled
+	upgrades_check.add_theme_font_size_override("font_size", 11)
+	upgrades_check.toggled.connect(func(on: bool) -> void:
+		GameManager.upgrades_enabled = on)
+	vbox.add_child(upgrades_check)
+
+	# Enemy spawn / pool section
+	vbox.add_child(HSeparator.new())
+	var elabel := Label.new()
+	elabel.text = "ENEMY POOL  +  SPAWN"
+	elabel.add_theme_color_override("font_color", Color(1.0, 0.7, 0.4))
+	vbox.add_child(elabel)
+
+	# Enable All / Disable All
+	var pool_row := HBoxContainer.new()
+	pool_row.add_theme_constant_override("separation", 4)
+	vbox.add_child(pool_row)
+
+	var enable_all_btn := Button.new()
+	enable_all_btn.text = "Enable All"
+	enable_all_btn.add_theme_font_size_override("font_size", 10)
+	enable_all_btn.pressed.connect(_enable_all_enemies)
+	pool_row.add_child(enable_all_btn)
+
+	var disable_all_btn := Button.new()
+	disable_all_btn.text = "Disable All"
+	disable_all_btn.add_theme_font_size_override("font_size", 10)
+	disable_all_btn.pressed.connect(_disable_all_enemies)
+	pool_row.add_child(disable_all_btn)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 280)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vbox.add_child(scroll)
+
+	var enemy_vbox := VBoxContainer.new()
+	enemy_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	enemy_vbox.add_theme_constant_override("separation", 2)
+	scroll.add_child(enemy_vbox)
+
+	for enemy_id in EnemyDB.get_all_ids():
+		var data := EnemyDB.get_enemy(enemy_id)
+		var etype: String = data.get("enemy_type", "")
+		if etype == "boss_small" or etype == "boss_big":
+			continue   # bosses are not in the spawn pool
+		enemy_vbox.add_child(_make_enemy_row(enemy_id, etype))
+
 	add_child(_panel)
 
 func _make_weapon_row(type: String) -> HBoxContainer:
@@ -180,6 +241,74 @@ func _toggle_god_mode() -> void:
 	_god_btn.add_theme_color_override(
 		"font_color", Color(0.2, 1.0, 0.2) if god_mode else Color(1.0, 1.0, 1.0)
 	)
+
+func _make_enemy_row(enemy_id: String, enemy_type: String) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 3)
+
+	# Pool toggle checkbox
+	var check := CheckButton.new()
+	check.button_pressed = EnemyDB.is_enabled(enemy_id)
+	check.custom_minimum_size = Vector2(36, 20)
+	check.toggled.connect(func(on: bool) -> void:
+		EnemyDB.set_enabled(enemy_id, on))
+	row.add_child(check)
+	_enemy_checks[enemy_id] = check
+
+	# Label
+	var lbl := Label.new()
+	lbl.text = enemy_id
+	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lbl.add_theme_font_size_override("font_size", 10)
+	match enemy_type:
+		"elite":  lbl.modulate = Color(0.8, 0.6, 1.0)
+		"heavy":  lbl.modulate = Color(0.6, 0.8, 1.0)
+		"drone":  lbl.modulate = Color(0.6, 1.0, 0.7)
+		_:        lbl.modulate = Color(0.85, 0.85, 0.85)
+	row.add_child(lbl)
+
+	# Solo button — disables all others, enables only this one
+	var solo_btn := Button.new()
+	solo_btn.text = "Solo"
+	solo_btn.custom_minimum_size = Vector2(36, 20)
+	solo_btn.add_theme_font_size_override("font_size", 10)
+	solo_btn.pressed.connect(_solo_enemy.bind(enemy_id))
+	row.add_child(solo_btn)
+
+	# Spawn button — manual one-off spawn regardless of pool state
+	var spawn_btn := Button.new()
+	spawn_btn.text = "Spawn"
+	spawn_btn.custom_minimum_size = Vector2(44, 20)
+	spawn_btn.add_theme_font_size_override("font_size", 10)
+	spawn_btn.pressed.connect(_spawn_enemy.bind(enemy_id))
+	row.add_child(spawn_btn)
+
+	return row
+
+func _spawn_enemy(enemy_id: String) -> void:
+	var enemy_scene := load("res://scenes/enemies/Enemy.tscn") as PackedScene
+	if enemy_scene == null:
+		return
+	var enemy := enemy_scene.instantiate()
+	enemy.enemy_id = enemy_id
+	var vp := get_viewport().get_visible_rect().size
+	enemy.global_position = Vector2(vp.x * 0.65, vp.y * 0.5)
+	get_tree().root.add_child(enemy)
+
+func _enable_all_enemies() -> void:
+	EnemyDB.enable_all()
+	for enemy_id in _enemy_checks:
+		_enemy_checks[enemy_id].button_pressed = true
+
+func _disable_all_enemies() -> void:
+	EnemyDB.disable_all_non_boss()
+	for enemy_id in _enemy_checks:
+		_enemy_checks[enemy_id].button_pressed = false
+
+func _solo_enemy(enemy_id: String) -> void:
+	EnemyDB.enable_only(enemy_id)
+	for id in _enemy_checks:
+		_enemy_checks[id].button_pressed = (id == enemy_id)
 
 func _kill_all_enemies() -> void:
 	for node in get_tree().get_nodes_in_group("level_objects"):
