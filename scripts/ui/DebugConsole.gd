@@ -123,7 +123,7 @@ func _execute(cmd: String) -> void:
 	var parts := cmd.split(" ", false)
 	if parts.is_empty():
 		return
-	match parts[0].to_lower():
+	match (parts[0] as String).to_lower():
 		"help":     _cmd_help()
 		"aim":      _cmd_flag("aiming_enabled",   "Auto-aim")
 		"god":      _cmd_flag("god_mode",         "God mode")
@@ -224,8 +224,8 @@ func _cmd_solo(parts: Array) -> void:
 
 func _cmd_credits(parts: Array) -> void:
 	var amount := 500
-	if parts.size() >= 2 and parts[1].is_valid_int():
-		amount = parts[1].to_int()
+	if parts.size() >= 2 and (parts[1] as String).is_valid_int():
+		amount = (parts[1] as String).to_int()
 	GameManager.credits += amount
 	EventBus.credits_changed.emit(GameManager.credits)
 	_ok("Added %d credits  (total: %d)" % [amount, GameManager.credits])
@@ -244,11 +244,11 @@ func _cmd_flock(parts: Array) -> void:
 		_err("Usage: flock <key> <value>")
 		_info("Keys: radius  sep_radius  sep_w  align_w  cohesion_w  seek_w  steer_rate")
 		return
-	var key := parts[1].to_lower()
-	if not parts[2].is_valid_float():
+	var key: String = parts[1].to_lower()
+	if not (parts[2] as String).is_valid_float():
 		_err("Value must be a number")
 		return
-	var val := parts[2].to_float()
+	var val: float = (parts[2] as String).to_float()
 	var prop_map: Dictionary = {
 		"radius":      "flock_radius",
 		"sep_radius":  "flock_sep_radius",
