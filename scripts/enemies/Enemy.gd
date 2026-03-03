@@ -16,6 +16,8 @@ var xp_value: int                = 10
 var gem_count: int               = 1
 var weapon_drop_chance: float    = 0.1
 var speed: float                 = 150.0
+var entry_speed: float           = 0.0    # fast entry speed; 0 = no entry phase
+var entry_depth: float           = 0.0    # viewport fraction where entry ends (e.g. 0.6)
 var contact_damage: int          = 10
 var wave_amplitude: float        = 0.0
 var wave_frequency: float        = 2.0
@@ -33,6 +35,7 @@ var armor_type: String           = "mechanical"
 var display_name: String = ""
 var wave_phase_offset: float = 0.0   # set by spawner for staggered flocks
 var current_hp: int
+var _entered: bool = false           # false until entry phase completes
 
 var _db_loaded: bool   = false
 var _has_image: bool   = false   # false = draw procedural placeholder
@@ -92,6 +95,8 @@ func load_from_db() -> void:
 	gem_count             = int(data.get("gem_count",         gem_count))
 	weapon_drop_chance    = float(data.get("weapon_drop_chance", weapon_drop_chance))
 	speed                 = float(data.get("speed",           speed))
+	entry_speed           = float(data.get("entry_speed",     entry_speed))
+	entry_depth           = float(data.get("entry_depth",     entry_depth))
 	contact_damage        = int(data.get("contact_damage",    contact_damage))
 	wave_amplitude        = float(data.get("wave_amplitude",  wave_amplitude))
 	wave_frequency        = float(data.get("wave_frequency",  wave_frequency))
@@ -144,6 +149,16 @@ func _process(delta: float) -> void:
 
 
 func _move(delta: float) -> void:
+	if not _entered:
+		if entry_speed <= 0.0 or entry_depth <= 0.0:
+			_entered = true   # no entry phase configured — skip straight to normal behaviour
+		else:
+			position.x -= entry_speed * delta
+			if global_position.x <= _viewport_w * entry_depth:
+				_entered = true
+				_start_y = global_position.y   # anchor sine/swoop to where entry ended
+		return
+
 	match movement_type:
 		"straight":
 			position.x -= speed * delta
