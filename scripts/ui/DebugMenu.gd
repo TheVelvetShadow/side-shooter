@@ -255,9 +255,10 @@ func _make_enemy_row(enemy_id: String, enemy_type: String) -> HBoxContainer:
 	row.add_child(check)
 	_enemy_checks[enemy_id] = check
 
-	# Label
+	# Label — show display name with id in smaller text
 	var lbl := Label.new()
-	lbl.text = enemy_id
+	var display_name: String = EnemyDB.get_enemy(enemy_id).get("name", enemy_id)
+	lbl.text = "%s  [%s]" % [display_name, enemy_id]
 	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lbl.add_theme_font_size_override("font_size", 10)
 	match enemy_type:

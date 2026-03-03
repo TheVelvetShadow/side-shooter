@@ -1,5 +1,6 @@
 {
   "enemy_01": {
+    "name": "Scout Fighter",
     "first_ante": 1, "first_level": 1,
     "enemy_type": "fighter", "movement_type": "straight",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -12,6 +13,7 @@
     "hp_scale": 1.3, "damage_scale": 1.2, "armor_type": "mechanical"
   },
   "enemy_02": {
+    "name": "Wave Fighter",
     "first_ante": 1, "first_level": 1,
     "enemy_type": "fighter", "movement_type": "sine",
     "wave_amplitude": 60.0, "wave_frequency": 2.0,
@@ -24,6 +26,7 @@
     "hp_scale": 1.3, "damage_scale": 1.2, "armor_type": "mechanical"
   },
   "enemy_03": {
+    "name": "Dive Bomber",
     "first_ante": 1, "first_level": 1,
     "enemy_type": "fighter", "movement_type": "swoop",
     "wave_amplitude": 80.0, "wave_frequency": 0.0,
@@ -36,6 +39,7 @@
     "hp_scale": 1.3, "damage_scale": 1.2, "armor_type": "organic"
   },
   "enemy_04": {
+    "name": "Stalker",
     "first_ante": 1, "first_level": 1,
     "enemy_type": "elite", "movement_type": "homing",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -48,6 +52,7 @@
     "hp_scale": 1.35, "damage_scale": 1.25, "armor_type": "shielded"
   },
   "enemy_05": {
+    "name": "Gun Platform",
     "first_ante": 1, "first_level": 2,
     "enemy_type": "heavy", "movement_type": "stationary",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -60,6 +65,7 @@
     "hp_scale": 1.35, "damage_scale": 1.2, "armor_type": "armored"
   },
   "enemy_06": {
+    "name": "Ram Trooper",
     "first_ante": 1, "first_level": 2,
     "enemy_type": "heavy", "movement_type": "dart",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -72,6 +78,7 @@
     "hp_scale": 1.35, "damage_scale": 1.2, "armor_type": "armored"
   },
   "enemy_07": {
+    "name": "Erratic Fighter",
     "first_ante": 1, "first_level": 2,
     "enemy_type": "fighter", "movement_type": "zigzag",
     "wave_amplitude": 50.0, "wave_frequency": 0.0,
@@ -84,6 +91,7 @@
     "hp_scale": 1.3, "damage_scale": 1.2, "armor_type": "mechanical"
   },
   "enemy_08": {
+    "name": "Swarm Drone",
     "first_ante": 1, "first_level": 2,
     "enemy_type": "drone", "movement_type": "flock",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -97,6 +105,7 @@
   },
 
   "enemy_09": {
+    "name": "Elite Raider",
     "first_ante": 1, "first_level": 3,
     "enemy_type": "elite", "movement_type": "straight",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -109,6 +118,7 @@
     "hp_scale": 1.35, "damage_scale": 1.25, "armor_type": "armored"
   },
   "enemy_10": {
+    "name": "Spread Cannon",
     "first_ante": 1, "first_level": 3,
     "enemy_type": "heavy", "movement_type": "stationary",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -121,6 +131,7 @@
     "hp_scale": 1.35, "damage_scale": 1.2, "armor_type": "armored"
   },
   "enemy_11": {
+    "name": "Assault Swarm",
     "first_ante": 1, "first_level": 3,
     "enemy_type": "drone", "movement_type": "flock",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -134,6 +145,7 @@
   },
 
   "enemy_12": {
+    "name": "Sine Striker",
     "first_ante": 2, "first_level": 1,
     "enemy_type": "fighter", "movement_type": "sine",
     "wave_amplitude": 70.0, "wave_frequency": 2.5,
@@ -146,6 +158,7 @@
     "hp_scale": 1.35, "damage_scale": 1.25, "armor_type": "mechanical"
   },
   "enemy_13": {
+    "name": "Zigzag Runner",
     "first_ante": 2, "first_level": 1,
     "enemy_type": "fighter", "movement_type": "zigzag",
     "wave_amplitude": 60.0, "wave_frequency": 0.0,
@@ -158,6 +171,7 @@
     "hp_scale": 1.3, "damage_scale": 1.2, "armor_type": "mechanical"
   },
   "enemy_14": {
+    "name": "Hunter Elite",
     "first_ante": 2, "first_level": 1,
     "enemy_type": "elite", "movement_type": "homing",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -170,6 +184,7 @@
     "hp_scale": 1.4, "damage_scale": 1.3, "armor_type": "shielded"
   },
   "enemy_15": {
+    "name": "Heavy Gunship",
     "first_ante": 2, "first_level": 1,
     "enemy_type": "heavy", "movement_type": "straight",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -183,6 +198,7 @@
   },
 
   "enemy_16": {
+    "name": "Ram Cannon",
     "first_ante": 2, "first_level": 2,
     "enemy_type": "heavy", "movement_type": "dart",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -195,6 +211,7 @@
     "hp_scale": 1.4, "damage_scale": 1.3, "armor_type": "armored"
   },
   "enemy_17": {
+    "name": "Swoop Squadron",
     "first_ante": 2, "first_level": 2,
     "enemy_type": "fighter", "movement_type": "swoop",
     "wave_amplitude": 90.0, "wave_frequency": 0.0,
@@ -207,6 +224,7 @@
     "hp_scale": 1.35, "damage_scale": 1.25, "armor_type": "mechanical"
   },
   "enemy_18": {
+    "name": "Fortress Gun",
     "first_ante": 2, "first_level": 2,
     "enemy_type": "heavy", "movement_type": "stationary",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -219,6 +237,7 @@
     "hp_scale": 1.4, "damage_scale": 1.3, "armor_type": "armored"
   },
   "enemy_19": {
+    "name": "Hornet Swarm",
     "first_ante": 2, "first_level": 2,
     "enemy_type": "drone", "movement_type": "flock",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -232,6 +251,7 @@
   },
 
   "enemy_20": {
+    "name": "Death Hunter",
     "first_ante": 2, "first_level": 3,
     "enemy_type": "elite", "movement_type": "homing",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -244,6 +264,7 @@
     "hp_scale": 1.45, "damage_scale": 1.35, "armor_type": "shielded"
   },
   "enemy_21": {
+    "name": "Viper Elite",
     "first_ante": 2, "first_level": 3,
     "enemy_type": "elite", "movement_type": "zigzag",
     "wave_amplitude": 55.0, "wave_frequency": 0.0,
@@ -256,6 +277,7 @@
     "hp_scale": 1.4, "damage_scale": 1.3, "armor_type": "shielded"
   },
   "enemy_22": {
+    "name": "Dreadnought",
     "first_ante": 2, "first_level": 3,
     "enemy_type": "heavy", "movement_type": "straight",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -269,6 +291,7 @@
   },
 
   "enemy_23": {
+    "name": "Veteran Zigzagger",
     "first_ante": 3, "first_level": 1,
     "enemy_type": "fighter", "movement_type": "zigzag",
     "wave_amplitude": 70.0, "wave_frequency": 0.0,
@@ -281,6 +304,7 @@
     "hp_scale": 1.4, "damage_scale": 1.3, "armor_type": "mechanical"
   },
   "enemy_24": {
+    "name": "Sine Bomber",
     "first_ante": 3, "first_level": 1,
     "enemy_type": "fighter", "movement_type": "sine",
     "wave_amplitude": 80.0, "wave_frequency": 3.0,
@@ -293,6 +317,7 @@
     "hp_scale": 1.4, "damage_scale": 1.3, "armor_type": "organic"
   },
   "enemy_25": {
+    "name": "Plague Swarm",
     "first_ante": 3, "first_level": 1,
     "enemy_type": "drone", "movement_type": "flock",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -305,6 +330,7 @@
     "hp_scale": 1.35, "damage_scale": 1.25, "armor_type": "organic"
   },
   "enemy_26": {
+    "name": "Siege Battery",
     "first_ante": 3, "first_level": 1,
     "enemy_type": "heavy", "movement_type": "stationary",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -318,6 +344,7 @@
   },
 
   "enemy_27": {
+    "name": "Dart Assassin",
     "first_ante": 3, "first_level": 2,
     "enemy_type": "elite", "movement_type": "dart",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -330,6 +357,7 @@
     "hp_scale": 1.45, "damage_scale": 1.35, "armor_type": "shielded"
   },
   "enemy_28": {
+    "name": "Swoop Bombers",
     "first_ante": 3, "first_level": 2,
     "enemy_type": "fighter", "movement_type": "swoop",
     "wave_amplitude": 100.0, "wave_frequency": 0.0,
@@ -342,6 +370,7 @@
     "hp_scale": 1.4, "damage_scale": 1.3, "armor_type": "mechanical"
   },
   "enemy_29": {
+    "name": "Titan",
     "first_ante": 3, "first_level": 2,
     "enemy_type": "heavy", "movement_type": "straight",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -354,6 +383,7 @@
     "hp_scale": 1.5, "damage_scale": 1.4, "armor_type": "armored"
   },
   "enemy_30": {
+    "name": "Death Swarm",
     "first_ante": 3, "first_level": 2,
     "enemy_type": "drone", "movement_type": "flock",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -367,6 +397,7 @@
   },
 
   "enemy_31": {
+    "name": "Apex Predator",
     "first_ante": 3, "first_level": 3,
     "enemy_type": "elite", "movement_type": "homing",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -379,6 +410,7 @@
     "hp_scale": 1.5, "damage_scale": 1.4, "armor_type": "shielded"
   },
   "enemy_32": {
+    "name": "Citadel",
     "first_ante": 3, "first_level": 3,
     "enemy_type": "heavy", "movement_type": "stationary",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -392,6 +424,7 @@
   },
 
   "boss_small_1_a": {
+    "name": "Warden Mk.I",
     "first_ante": 1, "first_level": 1,
     "enemy_type": "boss_small", "movement_type": "patrol_v",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -404,6 +437,7 @@
     "hp_scale": 1.4, "damage_scale": 1.3, "armor_type": "mechanical"
   },
   "boss_small_1_b": {
+    "name": "Warden Mk.II",
     "first_ante": 1, "first_level": 2,
     "enemy_type": "boss_small", "movement_type": "patrol_v",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -416,6 +450,7 @@
     "hp_scale": 1.4, "damage_scale": 1.3, "armor_type": "armored"
   },
   "boss_big_1": {
+    "name": "Fortress Station",
     "first_ante": 1, "first_level": 3,
     "enemy_type": "boss_big", "movement_type": "patrol_v",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -429,6 +464,7 @@
   },
 
   "boss_small_2_a": {
+    "name": "Sentinel Alpha",
     "first_ante": 2, "first_level": 1,
     "enemy_type": "boss_small", "movement_type": "patrol_v",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -441,6 +477,7 @@
     "hp_scale": 1.45, "damage_scale": 1.35, "armor_type": "mechanical"
   },
   "boss_small_2_b": {
+    "name": "Sentinel Prime",
     "first_ante": 2, "first_level": 2,
     "enemy_type": "boss_small", "movement_type": "patrol_v",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -453,6 +490,7 @@
     "hp_scale": 1.45, "damage_scale": 1.35, "armor_type": "armored"
   },
   "boss_big_2": {
+    "name": "Battlecruiser",
     "first_ante": 2, "first_level": 3,
     "enemy_type": "boss_big", "movement_type": "patrol_v",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -466,6 +504,7 @@
   },
 
   "boss_small_3_a": {
+    "name": "Overlord I",
     "first_ante": 3, "first_level": 1,
     "enemy_type": "boss_small", "movement_type": "patrol_v",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -478,6 +517,7 @@
     "hp_scale": 1.5, "damage_scale": 1.4, "armor_type": "mechanical"
   },
   "boss_small_3_b": {
+    "name": "Overlord II",
     "first_ante": 3, "first_level": 2,
     "enemy_type": "boss_small", "movement_type": "patrol_v",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
@@ -490,6 +530,7 @@
     "hp_scale": 1.5, "damage_scale": 1.4, "armor_type": "armored"
   },
   "boss_big_3": {
+    "name": "Mothership",
     "first_ante": 3, "first_level": 3,
     "enemy_type": "boss_big", "movement_type": "patrol_v",
     "wave_amplitude": 0.0, "wave_frequency": 0.0,
