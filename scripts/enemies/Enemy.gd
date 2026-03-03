@@ -33,7 +33,8 @@ var armor_type: String           = "mechanical"
 var wave_phase_offset: float = 0.0   # set by spawner for staggered flocks
 var current_hp: int
 
-var _db_loaded: bool  = false
+var _db_loaded: bool   = false
+var _has_image: bool   = false   # false = draw procedural placeholder
 var _viewport_w: float = 0.0
 var _start_y: float    = 0.0
 var _time: float       = 0.0
@@ -48,10 +49,23 @@ var _dart_active: bool  = false
 var _dart_dir: Vector2  = Vector2.LEFT
 var _zigzag_dir: float  = 1.0   # +1 or -1 for zigzag y-direction
 
+# Flock (boids) movement
+var _flock_velocity: Vector2 = Vector2.ZERO
+
+const _FLOCK_RADIUS      := 130.0   # neighbourhood — look for peers within this range
+const _FLOCK_SEP_RADIUS  := 48.0    # personal space — push away if closer than this
+const _FLOCK_SEP_W       := 2.2     # separation weight
+const _FLOCK_ALIGN_W     := 1.0     # alignment weight
+const _FLOCK_COHESION_W  := 0.7     # cohesion weight
+const _FLOCK_SEEK_W      := 1.4     # seek-player weight
+const _FLOCK_STEER_RATE  := 4.0     # how quickly velocity blends toward desired (higher = snappier)
+
 
 func _ready() -> void:
 	load_from_db()
 	current_hp = max_hp
+	if movement_type == "flock":
+		_flock_velocity = Vector2(-speed * 0.6, randf_range(-speed * 0.25, speed * 0.25))
 	_start_y = global_position.y
 	_viewport_w = get_viewport().get_visible_rect().size.x
 	body_entered.connect(_on_body_entered)
@@ -88,6 +102,24 @@ func load_from_db() -> void:
 	hp_scale              = float(data.get("hp_scale",        hp_scale))
 	damage_scale          = float(data.get("damage_scale",    damage_scale))
 	armor_type            = data.get("armor_type",            armor_type)
+	# Runtime sprite swap — if the entry has an "image" field, override the scene default.
+	var img_path: String = data.get("image", "")
+	if img_path != "":
+		var tex := load(img_path) as Texture2D
+		if tex:
+			var frames := SpriteFrames.new()
+			frames.add_frame("default", tex)
+			var spr := get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+			if spr:
+				spr.sprite_frames = frames
+				spr.play("default")
+			_has_image = true
+	# No image → hide the scene sprite and draw a procedural placeholder instead.
+	if not _has_image:
+		var spr := get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+		if spr:
+			spr.hide()
+		queue_redraw()
 
 
 func _find_player() -> void:
@@ -161,6 +193,55 @@ func _move(delta: float) -> void:
 		"stationary":
 			position.x -= speed * delta   # slow drift left
 
+		"flock":
+			_flock_steer(delta)
+			position += _flock_velocity * delta
+
+
+func _flock_steer(delta: float) -> void:
+	var sep       := Vector2.ZERO
+	var align     := Vector2.ZERO
+	var center    := Vector2.ZERO
+	var n_count   := 0
+	var sep_count := 0
+
+	for node in get_tree().get_nodes_in_group("level_objects"):
+		if node == self or not (node is Enemy) or node.movement_type != "flock":
+			continue
+		var diff := global_position - node.global_position
+		var dist := diff.length()
+		if dist > _FLOCK_RADIUS:
+			continue
+		# Separation — inverse-distance weighted push
+		if dist < _FLOCK_SEP_RADIUS and dist > 0.001:
+			sep += diff / (dist * dist)
+			sep_count += 1
+		# Alignment & cohesion
+		align  += node._flock_velocity
+		center += node.global_position
+		n_count += 1
+
+	var desired := Vector2.ZERO
+
+	if sep_count > 0:
+		desired += sep.normalized() * speed * _FLOCK_SEP_W
+
+	if n_count > 0:
+		desired += (align  / n_count).normalized()                 * speed * _FLOCK_ALIGN_W
+		desired += ((center / n_count) - global_position).normalized() * speed * _FLOCK_COHESION_W
+
+	# Seek player
+	if _player != null and is_instance_valid(_player):
+		desired += (_player.global_position - global_position).normalized() * speed * _FLOCK_SEEK_W
+	else:
+		desired += Vector2.LEFT * speed * _FLOCK_SEEK_W
+
+	# Blend toward desired velocity
+	if desired.length() > 0.001:
+		_flock_velocity = _flock_velocity.lerp(desired.normalized() * speed, delta * _FLOCK_STEER_RATE)
+	if _flock_velocity.length() > speed:
+		_flock_velocity = _flock_velocity.normalized() * speed
+
 
 func _fire_bullet() -> void:
 	if _player == null or not is_instance_valid(_player):
@@ -211,6 +292,84 @@ func _try_drop_weapon() -> void:
 		pickup.weapon_type = WeaponDB.random_weapon()["type"]
 		pickup.global_position = global_position
 		get_tree().root.add_child(pickup)
+
+
+# ── Procedural placeholder rendering ─────────────────────────────────────────
+
+func _draw() -> void:
+	if _has_image:
+		return
+	var color := _ph_color()
+	var size  := _ph_size()
+	_draw_shape(color, size)
+
+func _ph_color() -> Color:
+	match enemy_type:
+		"boss_big":   return Color(1.0, 0.15, 0.15)
+		"boss_small": return Color(1.0, 0.45, 0.1)
+		"elite":      return Color(0.75, 0.35, 1.0)
+		"heavy":      return Color(1.0, 0.55, 0.15)
+		"drone":      return Color(0.25, 1.0, 0.75)
+		_:            return Color(0.9, 1.0, 0.25)   # fighter
+
+func _ph_size() -> float:
+	match enemy_type:
+		"boss_big":   return 64.0
+		"boss_small": return 40.0
+		"heavy":      return 24.0
+		"elite":      return 20.0
+		"drone":      return 10.0
+		_:            return 16.0   # fighter
+
+func _draw_shape(color: Color, r: float) -> void:
+	var outline := Color(1.0, 1.0, 1.0, 0.35)
+	match enemy_type:
+		"drone":
+			draw_circle(Vector2.ZERO, r, color)
+			draw_arc(Vector2.ZERO, r, 0.0, TAU, 24, outline, 1.5)
+
+		"heavy":
+			var pts := PackedVector2Array([
+				Vector2(-r,       -r * 0.55),
+				Vector2( r * 0.4, -r * 0.55),
+				Vector2( r * 0.4,  r * 0.55),
+				Vector2(-r,        r * 0.55),
+			])
+			draw_colored_polygon(pts, color)
+			draw_polyline(PackedVector2Array([pts[0], pts[1], pts[2], pts[3], pts[0]]), outline, 1.5)
+
+		"elite":
+			var pts := PackedVector2Array([
+				Vector2(-r,        0.0),
+				Vector2(-r * 0.2, -r),
+				Vector2( r * 0.7, -r * 0.4),
+				Vector2( r * 0.7,  r * 0.4),
+				Vector2(-r * 0.2,  r),
+			])
+			draw_colored_polygon(pts, color)
+			draw_polyline(PackedVector2Array([pts[0], pts[1], pts[2], pts[3], pts[4], pts[0]]), outline, 1.5)
+
+		"boss_small", "boss_big":
+			var sides := 6 if enemy_type == "boss_small" else 8
+			var pts := PackedVector2Array()
+			for i in sides:
+				var angle := i * TAU / sides - PI / 2.0
+				pts.append(Vector2(cos(angle), sin(angle)) * r)
+			draw_colored_polygon(pts, color)
+			pts.append(pts[0])   # close the outline loop
+			draw_polyline(pts, Color(1.0, 1.0, 1.0, 0.45), 2.0)
+
+		_:  # fighter — arrow pointing left (direction of travel)
+			var pts := PackedVector2Array([
+				Vector2(-r,        0.0),
+				Vector2( r * 0.5, -r * 0.7),
+				Vector2( r * 0.2, -r * 0.25),
+				Vector2( r * 0.6,  0.0),
+				Vector2( r * 0.2,  r * 0.25),
+				Vector2( r * 0.5,  r * 0.7),
+			])
+			draw_colored_polygon(pts, color)
+			draw_polyline(PackedVector2Array([pts[0], pts[1], pts[2], pts[3], pts[4], pts[5], pts[0]]), outline, 1.5)
 
 
 func _on_body_entered(body: Node2D) -> void:
