@@ -7,7 +7,7 @@ extends CanvasLayer
 @export var opacity: float  = 0.85
 
 func _ready() -> void:
-	layer = 98
+	layer = 5
 	var rect := ColorRect.new()
 	rect.anchor_right  = 1.0
 	rect.anchor_bottom = 1.0
