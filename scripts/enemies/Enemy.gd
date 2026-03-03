@@ -1,9 +1,10 @@
 extends Area2D
 class_name Enemy
 
-const _PICKUP_SCENE = preload("res://scenes/weapons/WeaponPickup.tscn")
-const _GEM_SCENE    = preload("res://scenes/pickups/EnergyGem.tscn")
-const _BULLET_SCENE = preload("res://scenes/enemies/EnemyBullet.tscn")
+const _PICKUP_SCENE    = preload("res://scenes/weapons/WeaponPickup.tscn")
+const _GEM_SCENE       = preload("res://scenes/pickups/EnergyGem.tscn")
+const _BULLET_SCENE    = preload("res://scenes/enemies/EnemyBullet.tscn")
+const _EXPLOSION_SCRIPT = preload("res://scripts/fx/Explosion.gd")
 
 @export var enemy_id: String = ""
 
@@ -36,7 +37,11 @@ var armor_type: String           = "mechanical"
 var display_name: String = ""
 var wave_phase_offset: float = 0.0   # set by spawner for staggered flocks
 var current_hp: int
+var formation_line: int  = 0         # which wave index this enemy belongs to (0 = first wave)
 var _entered: bool = false           # false until entry phase completes
+var _formed: bool  = false           # false until formation phase completes
+var _formation_y: float = 0.0        # target y slot assigned during entry
+var _formed_time: float = 0.0        # wall-clock second when forming completed
 
 var _db_loaded: bool   = false
 var _has_image: bool   = false   # false = draw procedural placeholder
@@ -114,6 +119,8 @@ func load_from_db() -> void:
 			if spr:
 				spr.sprite_frames = frames
 				spr.play("default")
+				var s: float = float(data.get("sprite_scale", 0.13))
+				spr.scale = Vector2(s, s)
 			_has_image = true
 	# No image → hide the scene sprite and draw a procedural placeholder instead.
 	if not _has_image:
@@ -151,6 +158,12 @@ func _move(delta: float) -> void:
 			if global_position.x <= _viewport_w * entry_depth:
 				_entered = true
 				_start_y = global_position.y   # anchor sine/swoop to where entry ended
+				if movement_type == "formation_sine":
+					# fmod keeps slot in [0,1) even when base_phase pushes offset > TAU
+					var slot := fmod(wave_phase_offset, TAU) / TAU
+					var vp_h := get_viewport().get_visible_rect().size.y
+					# 15%–85% keeps amplitude-90 oscillation fully on screen
+					_formation_y = vp_h * 0.15 + slot * vp_h * 0.70
 		return
 
 	match movement_type:
@@ -207,6 +220,20 @@ func _move(delta: float) -> void:
 		"flock":
 			_flock_steer(delta)
 			position += _flock_velocity * delta
+
+		"formation_sine":
+			if not _formed:
+				# Slide vertically into assigned slot
+				var dy := _formation_y - position.y
+				if absf(dy) < 3.0:
+					position.y = _formation_y
+					_formed = true
+					_formed_time = Time.get_ticks_msec() * 0.001
+				else:
+					position.y += signf(dy) * 180.0 * delta
+			else:
+				# Slow straight drift left after forming — exits off-screen naturally
+				position.x -= speed * delta
 
 	if separation_radius > 0.0:
 		_apply_separation()
@@ -294,16 +321,44 @@ func _spawn_bullet(dir: Vector2) -> void:
 
 func take_damage(amount: int, source_slot: int = -1) -> void:
 	current_hp -= amount
+	_flash_hit()
+	EventBus.camera_shake.emit(2.5, 0.10)
 	if current_hp <= 0:
 		die(source_slot)
 
 
+func _flash_hit() -> void:
+	var tween := create_tween()
+	# Instantly brighten then fade back to normal
+	tween.tween_property(self, "modulate", Color(2.0, 2.0, 2.0, 1.0), 0.0)
+	tween.tween_property(self, "modulate", Color.WHITE, 0.15)
+
+
 func die(source_slot: int = -1) -> void:
 	EventBus.enemy_died.emit(enemy_id, xp_value)
+	EventBus.camera_shake.emit(_death_shake_strength(), 0.25)
+	_spawn_explosion()
 	for i in gem_count:
 		_drop_gem(source_slot)
 	_try_drop_weapon()
 	queue_free()
+
+
+func _death_shake_strength() -> float:
+	match enemy_type:
+		"boss_big":   return 18.0
+		"boss_small": return 12.0
+		"heavy":      return 8.0
+		"elite":      return 7.0
+		_:            return 5.0
+
+
+func _spawn_explosion() -> void:
+	var exp := Node2D.new()
+	exp.set_script(_EXPLOSION_SCRIPT)
+	exp.set("max_radius", _ph_size() * 2.5)
+	exp.global_position = global_position
+	get_tree().root.add_child(exp)
 
 
 func _drop_gem(source_slot: int) -> void:

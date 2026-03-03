@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://wyj3wlktp26a"]
 
 [ext_resource type="Script" uid="uid://cckdg1srq2jv2" path="res://scripts/main/Main.gd" id="1_maingd"]
+[ext_resource type="Script" path="res://scripts/systems/CameraShake.gd" id="13_camshake"]
 [ext_resource type="Script" path="res://scripts/ui/DebugMenu.gd" id="12_debugmenu"]
 [ext_resource type="PackedScene" uid="uid://dokhrnxnwmoym" path="res://scenes/background/parallax.tscn" id="2_85g3d"]
 [ext_resource type="PackedScene" uid="uid://b8u30hr14yhr1" path="res://scenes/player/player.tscn" id="2_player"]
@@ -9,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://dys6m8uk87vth" path="res://scenes/ui/LevelUpUI.tscn" id="9_levelup"]
 [ext_resource type="PackedScene" path="res://scenes/ui/WeaponUpgradeUI.tscn" id="10_wupgrade"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PilotAcademy.tscn" id="11_pacademy"]
-[ext_resource type="Script" path="res://scripts/systems/VignetteOverlay.gd" id="13_vignette"]
+
 
 [sub_resource type="Environment" id="1_env"]
 background_mode = 1
@@ -45,8 +46,9 @@ position = Vector2(16, 23)
 
 [node name="PilotAcademy" parent="." unique_id=1187321609 instance=ExtResource("11_pacademy")]
 
-[node name="VignetteOverlay" type="CanvasLayer" parent="."]
-script = ExtResource("13_vignette")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("13_camshake")
 
 [node name="DebugMenu" type="CanvasLayer" parent="." unique_id=999888777]
 script = ExtResource("12_debugmenu")

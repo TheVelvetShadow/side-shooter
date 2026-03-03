@@ -50,3 +50,6 @@ signal pilot_academy_closed
 
 # Damage chain (Balatro-style: fired per bullet hit when pilots modify damage)
 signal damage_chain_shown(steps: Array)
+
+# FX
+signal camera_shake(strength: float, duration: float)

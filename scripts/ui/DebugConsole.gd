@@ -137,8 +137,9 @@ func _execute(cmd: String) -> void:
 		"credits":  _cmd_credits(parts)
 		"xp":       _cmd_xp()
 		"level":    _cmd_level()
-		"flock":    _cmd_flock(parts)
-		_:          _err("Unknown: '%s'  —  type 'help'" % parts[0])
+		"flock":      _cmd_flock(parts)
+		"formation":  _cmd_formation(parts)
+		_:            _err("Unknown: '%s'  —  type 'help'" % parts[0])
 
 # ── Commands ──────────────────────────────────────────────────────────────────
 
@@ -161,7 +162,11 @@ func _cmd_help() -> void:
 
 [b]Flock[/b]
   flock <key> <val>
-  keys: radius  sep_radius  sep_w  align_w  cohesion_w  seek_w  steer_rate""")
+  keys: radius  sep_radius  sep_w  align_w  cohesion_w  seek_w  steer_rate
+
+[b]Formation[/b]
+  formation base_x <val>  — where wave 0 stops (fraction of viewport, default 0.70)
+  formation step   <val>  — extra leftward offset per successive wave (default 0.12)""")
 
 func _cmd_flag(property: String, label: String) -> void:
 	var val := not GameManager.get(property) as bool
@@ -264,3 +269,21 @@ func _cmd_flock(parts: Array) -> void:
 		return
 	GameManager.set(prop_map[key], val)
 	_ok("flock.%s = %.2f" % [key, val])
+
+func _cmd_formation(parts: Array) -> void:
+	if parts.size() < 3:
+		_err("Usage: formation <key> <value>")
+		_info("Keys: base_x  step")
+		return
+	var key: String = (parts[1] as String).to_lower()
+	if not (parts[2] as String).is_valid_float():
+		_err("Value must be a number")
+		return
+	var val: float = clampf((parts[2] as String).to_float(), 0.0, 1.0)
+	match key:
+		"base_x": GameManager.formation_base_x = val
+		"step":   GameManager.formation_x_step  = val
+		_:
+			_err("Unknown key '%s'  —  valid: base_x  step" % key)
+			return
+	_ok("formation.%s = %.2f" % [key, val])

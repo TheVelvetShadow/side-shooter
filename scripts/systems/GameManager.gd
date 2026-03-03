@@ -24,6 +24,10 @@ var show_enemy_labels: bool = true      # draw name tags above enemies
 var aiming_enabled: bool = false        # when false, bullets fire straight left
 var god_mode: bool = false              # negate all incoming player damage
 
+# --- Formation parameters (live-tweakable) ---
+var formation_base_x: float  = 0.70   # where the first wave stops (fraction of viewport width)
+var formation_x_step: float  = 0.12   # how much further left each successive wave stops
+
 # --- Flock parameters (live-tweakable) ---
 var flock_radius: float      = 130.0   # neighbourhood search radius
 var flock_sep_radius: float  = 48.0    # personal space — push apart below this
