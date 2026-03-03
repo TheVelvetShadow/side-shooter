@@ -30,6 +30,7 @@ var damage_scale: float          = 1.2
 var armor_type: String           = "mechanical"
 
 # Runtime state
+var display_name: String = ""
 var wave_phase_offset: float = 0.0   # set by spawner for staggered flocks
 var current_hp: int
 
@@ -82,6 +83,7 @@ func load_from_db() -> void:
 	if data.is_empty():
 		push_error("Enemy: no data for id '%s'" % enemy_id)
 		return
+	display_name          = data.get("name",                  enemy_id)
 	enemy_type            = data.get("enemy_type",            enemy_type)
 	movement_type         = data.get("movement_type",         movement_type)
 	spawn_behaviour       = data.get("spawn_behaviour",       spawn_behaviour)
@@ -208,7 +210,8 @@ func _flock_steer(delta: float) -> void:
 	for node in get_tree().get_nodes_in_group("level_objects"):
 		if node == self or not (node is Enemy) or node.movement_type != "flock":
 			continue
-		var diff := global_position - node.global_position
+		var peer := node as Enemy
+		var diff := global_position - peer.global_position
 		var dist := diff.length()
 		if dist > _FLOCK_RADIUS:
 			continue
@@ -217,8 +220,8 @@ func _flock_steer(delta: float) -> void:
 			sep += diff / (dist * dist)
 			sep_count += 1
 		# Alignment & cohesion
-		align  += node._flock_velocity
-		center += node.global_position
+		align  += peer._flock_velocity
+		center += peer.global_position
 		n_count += 1
 
 	var desired := Vector2.ZERO
@@ -297,11 +300,15 @@ func _try_drop_weapon() -> void:
 # ── Procedural placeholder rendering ─────────────────────────────────────────
 
 func _draw() -> void:
-	if _has_image:
-		return
-	var color := _ph_color()
-	var size  := _ph_size()
-	_draw_shape(color, size)
+	if not _has_image:
+		_draw_shape(_ph_color(), _ph_size())
+	if OS.is_debug_build() and GameManager.show_enemy_labels and not display_name.is_empty():
+		var font  := ThemeDB.fallback_font
+		var y_off := -(_ph_size() + 6.0)
+		draw_string(font, Vector2(0.0, y_off - 12.0), display_name,
+				HORIZONTAL_ALIGNMENT_CENTER, -1, 10, Color(1.0, 1.0, 0.2, 0.9))
+		draw_string(font, Vector2(0.0, y_off),        "[%s]" % enemy_id,
+				HORIZONTAL_ALIGNMENT_CENTER, -1, 9,  Color(0.7, 0.7, 0.7, 0.6))
 
 func _ph_color() -> Color:
 	match enemy_type:

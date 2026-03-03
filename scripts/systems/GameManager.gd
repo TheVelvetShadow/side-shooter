@@ -15,7 +15,12 @@ var credits: int = 0
 # --- Weapon XP (global upgrade bar, filled by energy gems) ---
 var weapon_xp: int = 0
 var weapon_xp_threshold: int = 100
-var upgrades_enabled: bool = true   # debug toggle — skip upgrade cards when false
+
+# --- Debug flags ---
+var upgrades_enabled: bool = true       # skip weapon upgrade card menu when false
+var skip_ship_select: bool = true       # skip ship select screen on run start
+var debug_default_ship: String = "interceptor"
+var show_enemy_labels: bool = true      # draw name tags above enemies
 
 # --- Ship level (in-run, drives LevelUpUI stat upgrades) ---
 var ship_level: int = 1

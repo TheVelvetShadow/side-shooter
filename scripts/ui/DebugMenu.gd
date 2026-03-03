@@ -125,6 +125,25 @@ func _build_ui() -> void:
 		GameManager.upgrades_enabled = on)
 	vbox.add_child(upgrades_check)
 
+	var labels_check := CheckButton.new()
+	labels_check.text = "Show enemy labels"
+	labels_check.button_pressed = GameManager.show_enemy_labels
+	labels_check.add_theme_font_size_override("font_size", 11)
+	labels_check.toggled.connect(func(on: bool) -> void:
+		GameManager.show_enemy_labels = on
+		for node in get_tree().get_nodes_in_group("level_objects"):
+			if node.has_method("queue_redraw"):
+				node.queue_redraw())
+	vbox.add_child(labels_check)
+
+	var ship_skip_check := CheckButton.new()
+	ship_skip_check.text = "Skip ship select (next run)"
+	ship_skip_check.button_pressed = GameManager.skip_ship_select
+	ship_skip_check.add_theme_font_size_override("font_size", 11)
+	ship_skip_check.toggled.connect(func(on: bool) -> void:
+		GameManager.skip_ship_select = on)
+	vbox.add_child(ship_skip_check)
+
 	# Enemy spawn / pool section
 	vbox.add_child(HSeparator.new())
 	var elabel := Label.new()

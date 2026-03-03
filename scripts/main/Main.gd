@@ -7,9 +7,10 @@ func _ready() -> void:
 	EventBus.game_over.connect(_on_game_over)
 	EventBus.level_started.connect(_on_level_started)
 
-	var crosshair := Node2D.new()
-	crosshair.set_script(CrosshairScript)
-	add_child(crosshair)
+	if OS.is_debug_build() and GameManager.skip_ship_select:
+		var ship_data := ShipDB.get_ship(GameManager.debug_default_ship)
+		_on_ship_selected(GameManager.debug_default_ship, ship_data)
+		return
 
 	var ship_select := CanvasLayer.new()
 	ship_select.set_script(ShipSelectScript)
@@ -23,6 +24,10 @@ func _on_ship_selected(ship_id: String, ship_data: Dictionary) -> void:
 		player.apply_ship(ship_data)
 	GameManager.start_run(ship_id)
 	LevelManager.start_run()
+
+	var crosshair := Node2D.new()
+	crosshair.set_script(CrosshairScript)
+	add_child(crosshair)
 
 func _on_level_started(_ante: int, _level: int) -> void:
 	for node in get_tree().get_nodes_in_group("level_objects"):
