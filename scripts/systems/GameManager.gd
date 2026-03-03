@@ -22,6 +22,15 @@ var skip_ship_select: bool = true       # skip ship select screen on run start
 var debug_default_ship: String = "interceptor"
 var show_enemy_labels: bool = true      # draw name tags above enemies
 
+# --- Flock parameters (live-tweakable) ---
+var flock_radius: float      = 130.0   # neighbourhood search radius
+var flock_sep_radius: float  = 48.0    # personal space — push apart below this
+var flock_sep_w: float       = 2.2     # separation weight
+var flock_align_w: float     = 1.0     # alignment weight
+var flock_cohesion_w: float  = 0.7     # cohesion weight
+var flock_seek_w: float      = 1.4     # seek-player weight
+var flock_steer_rate: float  = 4.0     # velocity blend rate (higher = snappier)
+
 # --- Ship level (in-run, drives LevelUpUI stat upgrades) ---
 var ship_level: int = 1
 var ship_xp: int = 0

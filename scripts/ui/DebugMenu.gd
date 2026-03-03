@@ -110,6 +110,26 @@ func _build_ui() -> void:
 
 	vbox.add_child(HSeparator.new())
 
+	# Flock params
+	var flock_label := Label.new()
+	flock_label.text = "FLOCK PARAMS"
+	flock_label.add_theme_color_override("font_color", Color(0.6, 1.0, 0.7))
+	vbox.add_child(flock_label)
+
+	var flock_params := [
+		["Radius",      "flock_radius",     1.0,  10.0, 400.0],
+		["Sep radius",  "flock_sep_radius", 1.0,  5.0,  200.0],
+		["Sep weight",  "flock_sep_w",      0.1,  0.0,  10.0 ],
+		["Align weight","flock_align_w",    0.1,  0.0,  10.0 ],
+		["Cohesion",    "flock_cohesion_w", 0.1,  0.0,  10.0 ],
+		["Seek weight", "flock_seek_w",     0.1,  0.0,  10.0 ],
+		["Steer rate",  "flock_steer_rate", 0.1,  0.1,  20.0 ],
+	]
+	for p in flock_params:
+		vbox.add_child(_make_spinbox_row(p[0], p[1], p[2], p[3], p[4]))
+
+	vbox.add_child(HSeparator.new())
+
 	# Upgrades toggle
 	vbox.add_child(HSeparator.new())
 	var upgrades_label := Label.new()
@@ -329,6 +349,30 @@ func _solo_enemy(enemy_id: String) -> void:
 	EnemyDB.enable_only(enemy_id)
 	for id in _enemy_checks:
 		_enemy_checks[id].button_pressed = (id == enemy_id)
+
+func _make_spinbox_row(label_text: String, property: String, step: float, min_val: float, max_val: float) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+
+	var lbl := Label.new()
+	lbl.text = label_text
+	lbl.custom_minimum_size.x = 90
+	lbl.add_theme_font_size_override("font_size", 10)
+	row.add_child(lbl)
+
+	var spin := SpinBox.new()
+	spin.min_value = min_val
+	spin.max_value = max_val
+	spin.step = step
+	spin.value = GameManager.get(property)
+	spin.custom_minimum_size.x = 80
+	spin.add_theme_font_size_override("font_size", 10)
+	spin.value_changed.connect(func(v: float) -> void:
+		GameManager.set(property, v))
+	row.add_child(spin)
+
+	return row
+
 
 func _kill_all_enemies() -> void:
 	for node in get_tree().get_nodes_in_group("level_objects"):

@@ -18,6 +18,7 @@ var weapon_drop_chance: float    = 0.1
 var speed: float                 = 150.0
 var entry_speed: float           = 0.0    # fast entry speed; 0 = no entry phase
 var entry_depth: float           = 0.0    # viewport fraction where entry ends (e.g. 0.6)
+var separation_radius: float     = 0.0    # push away from same-type enemies within this distance; 0 = off
 var contact_damage: int          = 10
 var wave_amplitude: float        = 0.0
 var wave_frequency: float        = 2.0
@@ -56,14 +57,6 @@ var _zigzag_dir: float  = 1.0   # +1 or -1 for zigzag y-direction
 # Flock (boids) movement
 var _flock_velocity: Vector2 = Vector2.ZERO
 
-const _FLOCK_RADIUS      := 130.0   # neighbourhood — look for peers within this range
-const _FLOCK_SEP_RADIUS  := 48.0    # personal space — push away if closer than this
-const _FLOCK_SEP_W       := 2.2     # separation weight
-const _FLOCK_ALIGN_W     := 1.0     # alignment weight
-const _FLOCK_COHESION_W  := 0.7     # cohesion weight
-const _FLOCK_SEEK_W      := 1.4     # seek-player weight
-const _FLOCK_STEER_RATE  := 4.0     # how quickly velocity blends toward desired (higher = snappier)
-
 
 func _ready() -> void:
 	load_from_db()
@@ -97,6 +90,7 @@ func load_from_db() -> void:
 	speed                 = float(data.get("speed",           speed))
 	entry_speed           = float(data.get("entry_speed",     entry_speed))
 	entry_depth           = float(data.get("entry_depth",     entry_depth))
+	separation_radius     = float(data.get("separation_radius", separation_radius))
 	contact_damage        = int(data.get("contact_damage",    contact_damage))
 	wave_amplitude        = float(data.get("wave_amplitude",  wave_amplitude))
 	wave_frequency        = float(data.get("wave_frequency",  wave_frequency))
@@ -214,6 +208,22 @@ func _move(delta: float) -> void:
 			_flock_steer(delta)
 			position += _flock_velocity * delta
 
+	if separation_radius > 0.0:
+		_apply_separation()
+
+
+func _apply_separation() -> void:
+	for node in get_tree().get_nodes_in_group("level_objects"):
+		if node == self or not (node is Enemy):
+			continue
+		var peer := node as Enemy
+		if peer.enemy_id != enemy_id:
+			continue
+		var diff := global_position - peer.global_position
+		var dist := diff.length()
+		if dist < separation_radius and dist > 0.001:
+			position += diff.normalized() * (separation_radius - dist) * 0.5
+
 
 func _flock_steer(delta: float) -> void:
 	var sep       := Vector2.ZERO
@@ -228,10 +238,10 @@ func _flock_steer(delta: float) -> void:
 		var peer := node as Enemy
 		var diff := global_position - peer.global_position
 		var dist := diff.length()
-		if dist > _FLOCK_RADIUS:
+		if dist > GameManager.flock_radius:
 			continue
 		# Separation — inverse-distance weighted push
-		if dist < _FLOCK_SEP_RADIUS and dist > 0.001:
+		if dist < GameManager.flock_sep_radius and dist > 0.001:
 			sep += diff / (dist * dist)
 			sep_count += 1
 		# Alignment & cohesion
@@ -242,21 +252,21 @@ func _flock_steer(delta: float) -> void:
 	var desired := Vector2.ZERO
 
 	if sep_count > 0:
-		desired += sep.normalized() * speed * _FLOCK_SEP_W
+		desired += sep.normalized() * speed * GameManager.flock_sep_w
 
 	if n_count > 0:
-		desired += (align  / n_count).normalized()                 * speed * _FLOCK_ALIGN_W
-		desired += ((center / n_count) - global_position).normalized() * speed * _FLOCK_COHESION_W
+		desired += (align  / n_count).normalized()                     * speed * GameManager.flock_align_w
+		desired += ((center / n_count) - global_position).normalized() * speed * GameManager.flock_cohesion_w
 
 	# Seek player
 	if _player != null and is_instance_valid(_player):
-		desired += (_player.global_position - global_position).normalized() * speed * _FLOCK_SEEK_W
+		desired += (_player.global_position - global_position).normalized() * speed * GameManager.flock_seek_w
 	else:
-		desired += Vector2.LEFT * speed * _FLOCK_SEEK_W
+		desired += Vector2.LEFT * speed * GameManager.flock_seek_w
 
 	# Blend toward desired velocity
 	if desired.length() > 0.001:
-		_flock_velocity = _flock_velocity.lerp(desired.normalized() * speed, delta * _FLOCK_STEER_RATE)
+		_flock_velocity = _flock_velocity.lerp(desired.normalized() * speed, delta * GameManager.flock_steer_rate)
 	if _flock_velocity.length() > speed:
 		_flock_velocity = _flock_velocity.normalized() * speed
 
