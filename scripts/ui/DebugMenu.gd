@@ -2,6 +2,8 @@ extends CanvasLayer
 
 var _panel: PanelContainer
 var _god_btn: Button
+var _reload_btn: Button
+var _enemy_vbox: VBoxContainer
 
 # Tracks the CheckButton for each enemy so Solo can refresh them all
 var _enemy_checks: Dictionary = {}   # enemy_id -> CheckButton
@@ -107,6 +109,14 @@ func _build_ui() -> void:
 	kill_btn.pressed.connect(_kill_all_enemies)
 	row2.add_child(kill_btn)
 
+	var row3 := HBoxContainer.new()
+	vbox.add_child(row3)
+
+	_reload_btn = Button.new()
+	_reload_btn.text = "Reload Enemy Data"
+	_reload_btn.pressed.connect(_reload_enemy_data)
+	row3.add_child(_reload_btn)
+
 	vbox.add_child(HSeparator.new())
 
 	# Flock params
@@ -163,6 +173,52 @@ func _build_ui() -> void:
 		GameManager.skip_ship_select = on)
 	vbox.add_child(ship_skip_check)
 
+	# Lighting section
+	vbox.add_child(HSeparator.new())
+	var light_label := Label.new()
+	light_label.text = "LIGHTING"
+	light_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
+	vbox.add_child(light_label)
+
+	var ship_light_sub := Label.new()
+	ship_light_sub.text = "Ship Light"
+	ship_light_sub.add_theme_font_size_override("font_size", 10)
+	ship_light_sub.modulate = Color(0.8, 0.8, 0.8)
+	vbox.add_child(ship_light_sub)
+
+	var light_toggle := CheckButton.new()
+	light_toggle.text = "Enabled"
+	light_toggle.button_pressed = true
+	light_toggle.add_theme_font_size_override("font_size", 11)
+	light_toggle.toggled.connect(func(on: bool) -> void:
+		var l := _get_ship_light()
+		if l: l.enabled = on)
+	vbox.add_child(light_toggle)
+
+	vbox.add_child(_make_cb_spinbox_row("Energy", 0.1, 0.0, 8.0, 1.5,
+		func(v: float) -> void:
+			var l := _get_ship_light()
+			if l: l.energy = v))
+	vbox.add_child(_make_cb_spinbox_row("Range", 0.1, 0.1, 8.0, 2.5,
+		func(v: float) -> void:
+			var l := _get_ship_light()
+			if l: l.texture_scale = v))
+
+	var vig_sub := Label.new()
+	vig_sub.text = "Vignette"
+	vig_sub.add_theme_font_size_override("font_size", 10)
+	vig_sub.modulate = Color(0.8, 0.8, 0.8)
+	vbox.add_child(vig_sub)
+
+	vbox.add_child(_make_cb_spinbox_row("Strength", 0.05, 0.0, 3.0, 1.2,
+		func(v: float) -> void:
+			var vig := _get_vignette()
+			if vig: vig.set_params(v, vig.opacity)))
+	vbox.add_child(_make_cb_spinbox_row("Opacity", 0.05, 0.0, 1.0, 0.85,
+		func(v: float) -> void:
+			var vig := _get_vignette()
+			if vig: vig.set_params(vig.strength, v)))
+
 	# Enemy spawn / pool section
 	vbox.add_child(HSeparator.new())
 	var elabel := Label.new()
@@ -192,17 +248,17 @@ func _build_ui() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	vbox.add_child(scroll)
 
-	var enemy_vbox := VBoxContainer.new()
-	enemy_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	enemy_vbox.add_theme_constant_override("separation", 2)
-	scroll.add_child(enemy_vbox)
+	_enemy_vbox = VBoxContainer.new()
+	_enemy_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_enemy_vbox.add_theme_constant_override("separation", 2)
+	scroll.add_child(_enemy_vbox)
 
 	for enemy_id in EnemyDB.get_all_ids():
 		var data := EnemyDB.get_enemy(enemy_id)
 		var etype: String = data.get("enemy_type", "")
 		if etype == "boss_small" or etype == "boss_big":
 			continue   # bosses are not in the spawn pool
-		enemy_vbox.add_child(_make_enemy_row(enemy_id, etype))
+		_enemy_vbox.add_child(_make_enemy_row(enemy_id, etype))
 
 	add_child(_panel)
 
@@ -373,6 +429,22 @@ func _make_spinbox_row(label_text: String, property: String, step: float, min_va
 	return row
 
 
+func _reload_enemy_data() -> void:
+	EnemyDB.reload()
+	_enemy_checks.clear()
+	for child in _enemy_vbox.get_children():
+		child.queue_free()
+	for enemy_id in EnemyDB.get_all_ids():
+		var data := EnemyDB.get_enemy(enemy_id)
+		var etype: String = data.get("enemy_type", "")
+		if etype == "boss_small" or etype == "boss_big":
+			continue
+		_enemy_vbox.add_child(_make_enemy_row(enemy_id, etype))
+	_reload_btn.text = "Reloaded  ✓"
+	await get_tree().create_timer(1.5).timeout
+	_reload_btn.text = "Reload Enemy Data"
+
+
 func _kill_all_enemies() -> void:
 	for node in get_tree().get_nodes_in_group("level_objects"):
 		var n := node as Node
@@ -380,3 +452,34 @@ func _kill_all_enemies() -> void:
 			continue
 		if n.has_method("take_damage"):
 			n.call("take_damage", 999999, -1)
+
+func _get_ship_light() -> PointLight2D:
+	var player := get_tree().get_first_node_in_group("player")
+	if player == null:
+		return null
+	return player.get_node_or_null("ShipLight") as PointLight2D
+
+func _get_vignette() -> Node:
+	return get_parent().get_node_or_null("VignetteOverlay")
+
+func _make_cb_spinbox_row(label_text: String, step: float, min_val: float, max_val: float, default_val: float, setter: Callable) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+
+	var lbl := Label.new()
+	lbl.text = label_text
+	lbl.custom_minimum_size.x = 90
+	lbl.add_theme_font_size_override("font_size", 10)
+	row.add_child(lbl)
+
+	var spin := SpinBox.new()
+	spin.min_value = min_val
+	spin.max_value = max_val
+	spin.step = step
+	spin.value = default_val
+	spin.custom_minimum_size.x = 80
+	spin.add_theme_font_size_override("font_size", 10)
+	spin.value_changed.connect(setter)
+	row.add_child(spin)
+
+	return row

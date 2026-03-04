@@ -1,10 +1,11 @@
 extends Area2D
 class_name Enemy
 
-const _PICKUP_SCENE    = preload("res://scenes/weapons/WeaponPickup.tscn")
-const _GEM_SCENE       = preload("res://scenes/pickups/EnergyGem.tscn")
-const _BULLET_SCENE    = preload("res://scenes/enemies/EnemyBullet.tscn")
+const _PICKUP_SCENE     = preload("res://scenes/weapons/WeaponPickup.tscn")
+const _GEM_SCENE        = preload("res://scenes/pickups/EnergyGem.tscn")
+const _BULLET_SCENE     = preload("res://scenes/enemies/EnemyBullet.tscn")
 const _EXPLOSION_SCRIPT = preload("res://scripts/fx/Explosion.gd")
+const _ENEMY_SCENE      = preload("res://scenes/enemies/Enemy.tscn")
 
 @export var enemy_id: String = ""
 
@@ -32,6 +33,10 @@ var enemy_bullet_strength: int   = 8
 var hp_scale: float              = 1.3
 var damage_scale: float          = 1.2
 var armor_type: String           = "mechanical"
+var ph_size_override: float      = 0.0    # 0 = use type default; >0 = override placeholder size
+var splits_into: String          = ""     # enemy_id to spawn on death (asteroid-style split)
+var split_count: int             = 0      # how many children to spawn on death
+var rotation_speed: float        = 0.0   # radians/sec; applied every frame
 
 # Runtime state
 var display_name: String = ""
@@ -42,6 +47,8 @@ var _entered: bool = false           # false until entry phase completes
 var _formed: bool  = false           # false until formation phase completes
 var _formation_y: float = 0.0        # target y slot assigned during entry
 var _formed_time: float = 0.0        # wall-clock second when forming completed
+
+var _burst_vel: Vector2 = Vector2.ZERO   # outward velocity applied on split, decays to zero
 
 var _db_loaded: bool   = false
 var _has_image: bool   = false   # false = draw procedural placeholder
@@ -107,6 +114,9 @@ func load_from_db() -> void:
 	enemy_bullet_strength = int(data.get("enemy_bullet_strength", enemy_bullet_strength))
 	hp_scale              = float(data.get("hp_scale",        hp_scale))
 	damage_scale          = float(data.get("damage_scale",    damage_scale))
+	ph_size_override      = float(data.get("ph_size",         ph_size_override))
+	splits_into           = data.get("splits_into",          splits_into)
+	split_count           = int(data.get("split_count",      split_count))
 	armor_type            = data.get("armor_type",            armor_type)
 	# Runtime sprite swap — if the entry has an "image" field, override the scene default.
 	var img_path: String = data.get("image", "")
@@ -138,6 +148,8 @@ func _find_player() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
+	if rotation_speed != 0.0:
+		rotation += rotation_speed * delta
 	_move(delta)
 	if fire_interval > 0.0:
 		_shoot_timer += delta
@@ -150,6 +162,9 @@ func _process(delta: float) -> void:
 
 
 func _move(delta: float) -> void:
+	if _burst_vel.length_squared() > 1.0:
+		position += _burst_vel * delta
+		_burst_vel = _burst_vel.move_toward(Vector2.ZERO, _burst_vel.length() * 3.0 * delta)
 	if not _entered:
 		if entry_speed <= 0.0 or entry_depth <= 0.0:
 			_entered = true   # no entry phase configured — skip straight to normal behaviour
@@ -341,7 +356,24 @@ func die(source_slot: int = -1) -> void:
 	for i in gem_count:
 		_drop_gem(source_slot)
 	_try_drop_weapon()
+	_spawn_splits()
 	queue_free()
+
+
+func _spawn_splits() -> void:
+	if splits_into.is_empty() or split_count <= 0:
+		return
+	var spread := maxf(ph_size_override * 0.5, 20.0)
+	var axis := Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized()
+	var burst := ph_size_override * 4.0
+	for i in split_count:
+		var child := _ENEMY_SCENE.instantiate()
+		child.enemy_id = splits_into
+		var dir := axis if i % 2 == 0 else -axis
+		child.global_position = global_position + dir * spread
+		child._burst_vel = dir * burst
+		child.rotation_speed = randf_range(2.5, 5.0) * (1.0 if randf() > 0.5 else -1.0)
+		get_tree().root.add_child(child)
 
 
 func _death_shake_strength() -> float:
@@ -400,6 +432,8 @@ func _ph_color() -> Color:
 		_:            return Color(0.9, 1.0, 0.25)   # fighter
 
 func _ph_size() -> float:
+	if ph_size_override > 0.0:
+		return ph_size_override
 	match enemy_type:
 		"boss_big":   return 64.0
 		"boss_small": return 40.0

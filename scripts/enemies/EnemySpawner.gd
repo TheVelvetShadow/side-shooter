@@ -3,7 +3,7 @@ class_name EnemySpawner
 
 const _ENEMY_SCENE = preload("res://scenes/enemies/Enemy.tscn")
 
-@export var time_between_waves: float = 12.0
+@export var time_between_waves: float = 8.0
 @export var first_wave_delay:   float = 1.0
 @export var duplicate_lines:    int   = 2      # how many vertical lines per wave
 @export var line_x_gap:         float = 80.0   # horizontal gap between lines

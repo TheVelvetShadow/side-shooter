@@ -6,7 +6,9 @@ const MAX_SLOTS: int = 6
 @export var max_hp: int = 100
 @export var max_shield: int = 50
 @export var attack_multiplier: float = 1.0
-@export var move_speed: float = 300.0
+@export var move_speed: float = 462.0
+@export var fire_rate_mult: float = 1.2
+@onready var ship: PlayerShip = $Ship
 
 var armour: int = 0          # flat damage reduction per hit (from ship stat)
 var weapon_bonus: int = 0    # flat bonus added to all weapon damage before pilot chain
@@ -46,7 +48,8 @@ func _handle_movement() -> void:
 		Input.get_axis("move_up", "move_down")
 	)
 	velocity = dir.normalized() * move_speed if dir != Vector2.ZERO else Vector2.ZERO
-
+	ship.set_movement_state(dir.y)
+	
 func _handle_firing(delta: float) -> void:
 	if not Input.is_action_pressed("fire"):
 		return
@@ -56,7 +59,7 @@ func _handle_firing(delta: float) -> void:
 		slot_timers[i] -= delta
 		if slot_timers[i] <= 0.0:
 			_fire_from_slot(i)
-			slot_timers[i] = weapon_slots[i]["fire_rate"] / PilotManager.get_fire_rate_mult()
+			slot_timers[i] = weapon_slots[i]["fire_rate"] / (PilotManager.get_fire_rate_mult() * fire_rate_mult)
 
 func _fire_from_slot(slot: int) -> void:
 	if not bullet_scene:
@@ -89,7 +92,7 @@ func _fire_from_slot(slot: int) -> void:
 			if to_target.length() > 1.0:
 				bullet.velocity = to_target.normalized() * bullet.speed
 	else:
-		bullet.velocity = Vector2.LEFT * bullet.speed
+		bullet.velocity = Vector2.RIGHT * bullet.speed
 	EventBus.bullet_fired.emit({"position": bullet_spawn.global_position})
 
 func equip_weapon(weapon_data: Dictionary) -> void:

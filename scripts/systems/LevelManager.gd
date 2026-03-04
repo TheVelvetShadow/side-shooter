@@ -18,6 +18,10 @@ var waves_spawned: int = 0
 var active_enemies: int = 0
 var state: State = State.IDLE
 
+## Global enemy strength multiplier — scales all enemy HP, speed, and contact damage.
+## 1.0 = normal. Raise to make all enemies tougher; lower to nerf them globally.
+var enemy_strength: float = 1.0
+
 func _ready() -> void:
 	EventBus.enemy_spawned.connect(func(_id): active_enemies += 1)
 	EventBus.enemy_died.connect(_on_enemy_died)
@@ -34,7 +38,10 @@ func start_run() -> void:
 
 func get_difficulty() -> Dictionary:
 	var idx := clampi(ante - 1, 0, HP_MULT.size() - 1)
-	return {"hp_mult": HP_MULT[idx], "speed_mult": SPEED_MULT[idx]}
+	return {
+		"hp_mult":    HP_MULT[idx]    * enemy_strength,
+		"speed_mult": SPEED_MULT[idx] * enemy_strength,
+	}
 
 func _on_wave_spawned(wave_index: int) -> void:
 	waves_spawned = wave_index + 1

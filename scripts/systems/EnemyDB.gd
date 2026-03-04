@@ -4,6 +4,10 @@ var _enemies: Dictionary = {}
 var _disabled: Dictionary = {}   # enemy_id -> true when excluded from spawn pool
 
 func _ready() -> void:
+	reload()
+
+func reload() -> void:
+	_enemies.clear()
 	var file := FileAccess.open("res://data/enemies.json", FileAccess.READ)
 	if file == null:
 		push_error("EnemyDB: cannot open res://data/enemies.json")
